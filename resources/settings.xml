@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+    <category id="pvr_artwork" label="32000">
+		<setting type="lsep" label="32001"/>
+		<setting id="pvr_art_recordings_only" type="bool" label="32002" default="false" />
+		<setting id="pvr_art_custom" type="bool" label="32005" default="false" />
+		<setting id="pvr_art_download" type="bool" label="32007" default="false" enable="eq(-1,true)" />
+		<setting id="pvr_art_custom_path" type="folder" label="32006" source="auto" visible="eq(-2,true) + eq(-1,true)" />
+		<setting id="use_tmdb" type="bool" label="32003" default="true" />
+	</category>
+	<category id="pvr_tuning" label="32008">
+        <setting type="lsep" label="32009" />
+		<setting id="pvr_art_ignore_channels" type="text" label="32010" default="" />
+		<setting id="pvr_art_ignore_titles" type="text" label="32011" default="" />
+		<setting id="pvr_art_ignore_genres" type="text" label="32025" default="Sport, News" />
+		<setting id="pvr_art_ignore_commongenre" type="bool" label="32026" default="true" />
+		<setting type="lsep" label="32004" />
+		<setting id="pvr_art_splittitlechar" type="text" label="32012" default="(|;" />
+		<setting id="pvr_art_replace_by_space" type="text" label="32013" default="_" />
+		<setting id="pvr_art_stripchars" type="text" label="32014" default="\*|,|(|)|;|`|_new|new_|.|\'" />
+		<setting type="sep" />
+		<setting id="log_results" type="bool" label="32044" default="false" />
+    </category>
+	<category id="api_key" label="32052">
+		<setting type="lsep" label="32053" />
+		<setting id="tmdb_apikey" type="text" label="32054" default="" />
+	</category>
+</settings>

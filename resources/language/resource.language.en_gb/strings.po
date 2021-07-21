@@ -1,0 +1,203 @@
+# Kodi language file
+# Addon Name: PVR artwork and metadata module
+# Addon id: script.module.pvr.artwork
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2014-10-26 17:05+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#32000"
+msgid "PVR Artwork"
+msgstr ""
+
+msgctxt "#32001"
+msgid "PVR artwork scraper"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Lookup for artwork/metadata only for TV recordings"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Enable TMDB online scraper"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Use '|' as delimiter to enter multiple values"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Lookup for artwork in local databases/custom folders first"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Path to custom folder"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Download artwork to custom folder"
+msgstr ""
+
+msgctxt "#32008"
+msgid "Fine Tuning"
+msgstr ""
+
+msgctxt "#32009"
+msgid "Use ', ' as delimiter to enter multiple values"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Channels to ignore"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Titles to ignore"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Split title on character (use only first part)"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Characters to replace by space in title"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Characters to strip from title"
+msgstr ""
+
+msgctxt "#32015"
+msgid "unknown"
+msgstr ""
+
+# empty string 32016 - 32017
+
+msgctxt "#32018"
+msgid "Enable online scraper"
+msgstr ""
+
+msgctxt "#32019"
+msgid "Lookup artwork in a custom folder"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Path to custom folder"
+msgstr ""
+
+msgctxt "#32021"
+msgid "No metadata and/or artwork found"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Define Content"
+msgstr ""
+
+# empty strings 32023 - 32024
+
+msgctxt "#32025"
+msgid "Ignore Genres"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Skip news/weather/sports/commercial... (needs correct epg info)"
+msgstr ""
+
+msgctxt "#32027"
+msgid "One or more filters are active for this item. Are you sure you want to proceed?"
+msgstr ""
+
+msgctxt "#32028"
+msgid "Refresh - auto lookup"
+msgstr ""
+
+msgctxt "#32029"
+msgid "Refresh - manual lookup"
+msgstr ""
+
+msgctxt "#32030"
+msgid "Remove channel from ignore list"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Add channel to ignore list"
+msgstr ""
+
+msgctxt "#32032"
+msgid "Remove title from ignore list"
+msgstr ""
+
+msgctxt "#32033"
+msgid "Add title to ignore list"
+msgstr ""
+
+msgctxt "#32034"
+msgid "Configure module settings"
+msgstr ""
+
+msgctxt "#32035"
+msgid "Settings for PVR artwork"
+msgstr ""
+
+msgctxt "#32036"
+msgid "Manual configure artwork"
+msgstr ""
+
+msgctxt "#32037"
+msgid "Continuing"
+msgstr ""
+
+msgctxt "#32038"
+msgid "Ended"
+msgstr ""
+
+msgctxt "#32039"
+msgid "Returning"
+msgstr ""
+
+msgctxt "#32040"
+msgid "Released"
+msgstr ""
+
+msgctxt "#32041"
+msgid "Is the selected PVR title '%s' a Movie or TV Show?"
+msgstr ""
+
+msgctxt "#32042"
+msgid "Movie"
+msgstr ""
+
+msgctxt "#32043"
+msgid "TV Show"
+msgstr ""
+
+msgctxt "#32044"
+msgid "Log lookup results in debug log"
+msgstr ""
+
+msgctxt "#32045"
+msgid "Canceled"
+msgstr ""
+
+# empty strings 32046 - 32051
+
+msgctxt "#32052"
+msgid "TMDB API Key"
+msgstr ""
+
+msgctxt "#32053"
+msgid "Unlock TMDB by providing a custom API key"
+msgstr ""
+
+msgctxt "#32054"
+msgid "Personal API-Key for TMDB"
+msgstr ""
+

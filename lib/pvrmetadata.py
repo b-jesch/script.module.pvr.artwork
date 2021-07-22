@@ -13,16 +13,12 @@ from tmdb import Tmdb
 
 from datetime import timedelta
 
-dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart,jpg', 'banner': 'banner.jpg',
-                 'clearlogo': 'clearlogo.png', 'clearart': 'clearart.png', 'characterart': 'characterart.png',
-                 'poster': 'poster.jpg', 'landscape': 'landscape.jpg'}
-
 if ADDON.getSetting('pvr_art_custom_path') == '':
     ADDON.setSetting('pvr_art_custom_path', PROFILE)
     log('set artwork costum path to %s' % PROFILE)
 
 
-def download_artwork(folderpath, artwork):
+def download_artwork(folderpath, artwork, dict_arttypes):
     """
         download artwork to local folder
     """
@@ -83,7 +79,7 @@ def download_image(filename, url):
     return url
 
 
-def manual_set_artwork(artwork):
+def manual_set_artwork(artwork, dict_arttypes):
     """
         Allow user to manually select the artwork with a select dialog
         show dialogselect with all artwork options
@@ -158,6 +154,10 @@ class PVRMetaData(object):
     def __init__(self):
         self.cache = simplecache.SimpleCache()
         self.tmdb = Tmdb()
+        self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart,jpg',
+                              'banner': 'banner.jpg', 'clearlogo': 'clearlogo.png', 'clearart': 'clearart.png',
+                              'characterart': 'characterart.png', 'poster': 'poster.jpg', 'landscape': 'landscape.jpg'}
+
         log('Initialized', type=xbmc.LOGINFO)
 
     def lookup_local_recording(self, title):
@@ -199,7 +199,7 @@ class PVRMetaData(object):
             # we have found a folder for the title, look for artwork
             files = xbmcvfs.listdir(title_path)[1]
             for item in files:
-                if item.split('.')[0] in dict_arttypes:
+                if item.split('.')[0] in self.dict_arttypes:
                     details['art'][item.split('.')[0]] = os.path.join(title_path, item)
             details.update({'path': title_path})
         if details: log('fetch artwork from %s' % title_path)
@@ -416,7 +416,7 @@ class PVRMetaData(object):
         # use cleantitle when searching cache
 
         searchtitle = self.cleanup_title(title.lower())
-        cache_str = "pvr_artwork.%s.%s" % (searchtitle, channel.lower())
+        cache_str = "pvr_artwork.%s.%s" % (searchtitle, pure_channelname(channel).lower())
         cache = self.cache.get(cache_str)
 
         if cache and channel and not manual_select and not ignore_cache:
@@ -438,7 +438,7 @@ class PVRMetaData(object):
                     genre = recording["genre"]
                     channel = recording["channel"]
 
-            details = dict({'pvrtitle': title, 'pvrchannel': channel, 'pvrgenre': genre, 'cachestr': cache_str,
+            details = dict({'pvrtitle': title, 'pvrchannel': channel, 'pvrgenre': genre, 'cache_str': cache_str,
                             'media_type': '', 'art': dict()})
             if art: details.update({'thumbnail': art})
 
@@ -511,7 +511,7 @@ class PVRMetaData(object):
                 # download artwork to custom folder
                 if ADDON.getSetting("pvr_art_download").lower() == "true":
                     details.update({'path': self.get_custom_path(searchtitle, title)})
-                    details["art"] = download_artwork(details['path'], details["art"])
+                    details["art"] = download_artwork(details['path'], details["art"], self.dict_arttypes)
 
             if ADDON.getSetting('log_results') == 'true':
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
@@ -586,11 +586,11 @@ class PVRMetaData(object):
         """manual override artwork options"""
 
         details = self.get_pvr_artwork(title=title, channel=channel, genre=genre)
-        cache_str = details["cachestr"]
 
         # show dialogselect with all artwork option
-        changemade, artwork = manual_set_artwork(details["art"])
+        changemade, artwork = manual_set_artwork(details["art"], self.dict_arttypes)
         if changemade:
             details["art"] = artwork
             # save results in cache
-            self.cache.set(cache_str, details, expiration=timedelta(days=365))
+            self.cache.set(details['cache_str'], details, expiration=timedelta(days=365))
+        return details

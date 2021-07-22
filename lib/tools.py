@@ -73,7 +73,7 @@ def pure_channelname(channel):
     """
         reduce channel name to SD channels only
     """
-    for item in [' HD', ' FHD', ' UHD']:
+    for item in [' HD', ' FHD', ' UHD', ' hd', ' fhd', ' uhd']:
         if item in channel: return channel.replace(item, '')
     return channel
 

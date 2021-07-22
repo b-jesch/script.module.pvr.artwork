@@ -148,7 +148,7 @@ msgid "Settings for PVR artwork"
 msgstr ""
 
 msgctxt "#32036"
-msgid "Manual configure artwork"
+msgid "Change artwork"
 msgstr ""
 
 msgctxt "#32037"

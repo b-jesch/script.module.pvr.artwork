@@ -30,18 +30,16 @@ def download_artwork(folderpath, artwork, dict_arttypes):
             elif key == "fanarts":
                 images = list()
                 for count, image in enumerate(item[key]):
+                    if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
                     image = download_image(os.path.join(folderpath, "fanart%s.jpg" % str(count + 1)), image)
                     images.append(image)
-                    if count >= 4:
-                        break
                 art[key] = images
             elif key == "posters":
                 images = list()
                 for count, image in enumerate(item[key]):
+                    if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
                     image = download_image(os.path.join(folderpath, "poster%s.jpg" % str(count + 1)), image)
                     images.append(image)
-                    if count >= 4:
-                        break
                 art[key] = images
             else:
                 art[key] = item[key]
@@ -266,7 +264,7 @@ class PVRMetaData(object):
                         match = SM(None, item, directory).ratio()
                         if match >= strictness: return curpath
 
-            if not title_path and ADDON.getSetting("pvr_art_download") == "true":
+            if not title_path and ADDON.getSetting("pvr_art_download").lower() == "true":
                 title_path = os.path.join(custom_path, normalize_string(title))
         return title_path
 
@@ -468,7 +466,7 @@ class PVRMetaData(object):
 
             # if manual lookup and no mediatype, ask the user
             if manual_select and not details["media_type"]:
-                choice = xbmcgui.Dialog().yesnocustom(LOC(32022), LOC(32041) % searchtitle, LOC(32016),
+                choice = xbmcgui.Dialog().yesnocustom(LOC(32022), LOC(32041) % searchtitle, LOC(32015),
                                                       nolabel=LOC(32043), yeslabel=LOC(32042))
                 if choice == 0: details["media_type"] = "tvshow"
                 elif choice == 1: details["media_type"] = "movie"
@@ -483,7 +481,7 @@ class PVRMetaData(object):
             details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
 
             # do TMDB scraping if enabled and no arts in previous lookups
-            if ADDON.getSetting("use_tmdb").lower() == "true" and not details.get('art', False) \
+            if ADDON.getSetting("use_tmdb").lower() == "true" and not details['art'] \
                     and ADDON.getSetting('tmdb_apikey'):
 
                 log("scraping metadata from TMDB for title: %s (media type: %s)" % (searchtitle, details["media_type"]))

@@ -40,12 +40,12 @@ msgid "Lookup for artwork in local databases/custom folders first"
 msgstr "Suche zuerst in lokalen Datenbanken/Ordnern nach Artwork"
 
 msgctxt "#32006"
-msgid "Path to custom folder"
-msgstr "Pfad zum benutzerdefinierten Ordner"
+msgid "Path to download folder"
+msgstr "Pfad zum Download-Ordner"
 
 msgctxt "#32007"
-msgid "Download artwork to custom folder"
-msgstr "Artwork im benutzerdefinierten Ordner speichern"
+msgid "Download artwork"
+msgstr "Artwork herunterladen"
 
 msgctxt "#32008"
 msgid "Fine Tuning"
@@ -79,7 +79,11 @@ msgctxt "#32015"
 msgid "unknown"
 msgstr "unbekannt"
 
-# empty string 32016 - 32017
+msgctxt "#32016"
+msgid "max. count of downloads (poster, fanart)"
+msgstr "max. Anzahl Downloads (Poster, Fanart)"
+
+# empty string 32017
 
 msgctxt "#32018"
 msgid "Enable online scraper"

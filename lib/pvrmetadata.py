@@ -156,6 +156,8 @@ class PVRMetaData(object):
                               'banner': 'banner.jpg', 'clearlogo': 'clearlogo.png', 'clearart': 'clearart.png',
                               'characterart': 'characterart.png', 'poster': 'poster.jpg', 'landscape': 'landscape.jpg'}
 
+        self.dict_providers = {'imdb': 'IMDB', 'themoviedb': 'TMDB', 'tmdb': 'TMDB'}
+
         log('Initialized', type=xbmc.LOGINFO)
 
     def lookup_local_recording(self, title):
@@ -203,8 +205,8 @@ class PVRMetaData(object):
         if details: log('fetch artwork from %s' % title_path)
         return details
 
-    @staticmethod
-    def lookup_local_library(title, media_type):
+
+    def lookup_local_library(self, title, media_type):
         """
             lookup the title in the local video db
         """
@@ -213,32 +215,73 @@ class PVRMetaData(object):
 
         if not media_type or media_type == "tvshow":
             query = {'method': 'VideoLibrary.GetTVShows',
-                     'params': {'properties': ['art', 'file'],
+                     'params': {'properties': ['cast', 'file', 'art', 'genre', 'studio', 'premiered', 'mpaa',
+                                               'ratings'],
                                 'limits': {'start': 0, 'end': 1},
-                                'filter': {"operator": "is", "field": "title", "value": title}
+                                'filter': {'operator': 'is', 'field': 'title', 'value': title}
                                 }
                      }
             result = jsonrpc(query)
             if result and len(result['tvshows']) > 0:
-                details.update({'art': result['tvshows'][0].get('art', '')})
-                details.update({'media_type': 'tvshow', 'path': result['tvshows'][0].get('file', '')})
+                details.update({'cast': result['tvshows'][0]['cast'], 'path': result['tvshows'][0]['file'],
+                                'art': result['tvshows'][0]['art'], 'genre': result['tvshows'][0]['genre'],
+                                'studio': result['tvshows'][0]['studio'],
+                                'premiered': result['tvshows'][0]['premiered'], 'mpaa': result['tvshows'][0]['mpaa'],
+                                'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow'})
                 media_type = 'tvshow'
 
         if not details and (not media_type or media_type == "movie"):
             query = {'method': 'VideoLibrary.GetMovies',
-                     'params': {'properties': ['art', 'file'],
+                     'params': {'properties': ['cast', 'file', 'art', 'director', 'writer', 'genre', 'country',
+                                               'studio', 'premiered', 'mpaa', 'ratings'],
                                 'limits': {'start': 0, 'end': 1},
-                                'filter': {"operator": "is", "field": "title", "value": title}
+                                'filter': {'operator': 'is', 'field': 'title', 'value': title}
                                 }
                      }
             result = jsonrpc(query)
             if result and len(result['movies']) > 0:
-                details.update({'art': result['movies'][0].get('art', '')})
-                details.update({'media_type': 'movie', 'path': result['movies'][0].get('file', '')})
+                details.update({'cast': result['movies'][0]['cast'], 'path': result['movies'][0]['file'],
+                                'art': result['movies'][0]['art'], 'director': result['movies'][0]['director'],
+                                'writer': result['movies'][0]['writer'], 'genre': result['movies'][0]['genre'],
+                                'country': result['movies'][0]['country'], 'studio': result['movies'][0]['studio'],
+                                'premiered': result['movies'][0]['premiered'], 'mpaa': result['movies'][0]['mpaa'],
+                                'ratings': result['movies'][0]['ratings'], 'media_type': 'movie'})
                 media_type = 'movie'
 
+        # unquote item values
+
+        if 'cast' in details:
+            for item in details['cast']:
+                if item.get('thumbnail', False): item.update({'thumbnail': url_unquote(item.get('thumbnail', ''))})
+
+        if 'ratings' in details:
+            rating = list()
+            for item in self.dict_providers:
+                if details['ratings'].get(item, False):
+                    rating.append('%s (%s)' % (round(details['ratings'][item]['rating'], 1), self.dict_providers[item]))
+            if rating: details.update({'rating': rating})
+
+        # repack extra fanarts, extraposters into list objects and unquote item values
+
         if 'art' in details:
-            for [key, value] in details['art'].items(): details['art'][key] = url_unquote(value)
+            fanarts = list()
+            posters = list()
+            rm_items = list()
+
+            for [key, value] in details['art'].items():
+                details['art'][key] = url_unquote(value)
+                for e in range(1, 6):
+                    if key == 'fanart%s' % e:
+                        fanarts.append(details['art'][key])
+                        rm_items.append(key)
+                    if key == 'poster%s' % e:
+                        posters.append(details['art'][key])
+                        rm_items.append(key)
+
+            for item in rm_items: details['art'].pop(item)
+
+            details['art'].update({'fanarts': fanarts})
+            details['art'].update({'posters': posters})
 
         if details and ADDON.getSetting('log_results') == 'true':
             log('fetch data for \'%s\' in %s database:' % (title, media_type), pretty_print=details)
@@ -350,16 +393,6 @@ class PVRMetaData(object):
         return media_type
 
     @staticmethod
-    def translate_string(_str):
-        """
-            translate the received english string for status from the various sources like tvdb, tmbd etc
-        """
-        status = {'continuing': LOC(32037), 'ended': LOC(32038), 'returning': LOC(32039), 'released': LOC(32040),
-                  'canceled': LOC(32045)}
-        if _str.split(' ')[0].lower() in status: return status[_str.split(' ')[0].lower()]
-        return _str
-
-    @staticmethod
     def calc_duration(duration):
         """
             helper to get a formatted duration
@@ -394,11 +427,6 @@ class PVRMetaData(object):
         elif title:
             result = self.tmdb.search_video(title, year, preftype=preftype, manual_select=manual_select)
 
-        if result and result.get("status"):
-            result["status"] = self.translate_string(result["status"])
-        if result and result.get("runtime"):
-            result["runtime"] = result["runtime"] / 60
-            result.update(self.calc_duration(result["runtime"]))
         return result
 
     def get_pvr_artwork(self, title, channel="", genre="", year="", manual_select=False, ignore_cache=False):
@@ -510,6 +538,16 @@ class PVRMetaData(object):
                 if ADDON.getSetting("pvr_art_download").lower() == "true":
                     details.update({'path': self.get_custom_path(searchtitle, title)})
                     details["art"] = download_artwork(details['path'], details["art"], self.dict_arttypes)
+
+            if details.get("runtime", False):
+                details["runtime"] = details["runtime"] / 60
+                details.update({'runtime': self.calc_duration(details["runtime"])})
+            if details.get('premiered', False):
+                details.update({'premiered': convert_date(details.get('premiered'))})
+            if details.get('cast', False):
+                cast_and_role = list()
+                for cast in details['cast']: cast_and_role.append('%s (%s)' % (cast['name'], cast['role']))
+                details.update({'castandrole': cast_and_role})
 
             if ADDON.getSetting('log_results') == 'true':
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)

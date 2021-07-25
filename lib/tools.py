@@ -1,3 +1,5 @@
+import time
+
 import xbmc
 import xbmcaddon
 import json
@@ -109,3 +111,8 @@ def url_unquote(url):
         unquote urls, remove image scheme and trailing slashes
     """
     return unquote(url.replace('image://', '')).rstrip('/')
+
+
+def convert_date(date, date_format='%Y-%m-%d'):
+    dt = time.strptime(date, date_format)
+    return time.strftime(xbmc.getRegion('dateshort'), dt)

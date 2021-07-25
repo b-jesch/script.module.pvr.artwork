@@ -2,7 +2,6 @@ import xbmcgui
 import simplecache
 from operator import itemgetter
 from difflib import SequenceMatcher as SM
-from datetime import timedelta
 from tools import *
 
 
@@ -180,7 +179,7 @@ class Tmdb(object):
         """helper method to map the details received from tmdb to kodi compatible formatting"""
         if not data:
             return {}
-        details = {"tmdb_id": data["id"], "rating": data["vote_average"], "votes": data["vote_count"],
+        details = {"tmdb_id": data["id"], "rating": '%s (TMDB)' % data["vote_average"], "votes": data["vote_count"],
                    "popularity": data["popularity"] * 1000, "popularity.tmdb": data["popularity"] * 1000,
                    "plot": data["overview"], "genre": [item["name"] for item in data["genres"]],
                    "status": data["status"], "cast": [], "art": [], "writer": [], "director": [],

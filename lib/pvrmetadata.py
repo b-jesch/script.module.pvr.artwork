@@ -193,7 +193,9 @@ class PVRMetaData(object):
 
         # ToDo: Grab artists if an .artists folder exists
 
-        details = dict()
+        details = dict({'art': {}})
+        fanarts = list()
+        posters = list()
         title_path = self.get_custom_path(searchtitle, title)
         if title_path and xbmcvfs.exists(title_path):
             # we have found a folder for the title, look for artwork
@@ -201,10 +203,15 @@ class PVRMetaData(object):
             for item in files:
                 if item.split('.')[0] in self.dict_arttypes:
                     details['art'][item.split('.')[0]] = os.path.join(title_path, item)
+            for e in range(1, 6):
+                if ('fanart%s.jpg' % e) in files: fanarts.append(os.path.join(title_path, 'fanart%s.jpg' % e))
+                if ('poster%s.jpg' % e) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % e))
+            if fanarts: details['art'].update({'fanarts': fanarts})
+            if posters: details['art'].update({'posters': posters})
             details.update({'path': title_path})
+
         if details: log('fetch artwork from %s' % title_path)
         return details
-
 
     def lookup_local_library(self, title, media_type):
         """

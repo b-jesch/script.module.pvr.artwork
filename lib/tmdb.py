@@ -207,10 +207,13 @@ class Tmdb(object):
                 posters = self.get_best_images(data["images"]["posters"])
                 details["art"].append({'poster': posters[0]})
                 details["art"].append({'posters': posters[1:]})
+            if data["images"].get('logos'):
+                logos = self.get_best_images(data['images']['logos'], size='w500')
+                details['art'].append({'clearlogo': logos[0]})
         return details
 
     @staticmethod
-    def get_best_images(images):
+    def get_best_images(images, size='original'):
         """get the best 5 images based on number of likes and the language"""
         for image in images:
             score = 0
@@ -222,7 +225,7 @@ class Tmdb(object):
                     score += 1000
             image["score"] = score
             if not image["file_path"].startswith("https"):
-                image["file_path"] = "https://image.tmdb.org/t/p/original%s" % image["file_path"]
+                image["file_path"] = "https://image.tmdb.org/t/p/%s%s" % (size, image["file_path"])
         images = sorted(images, key=itemgetter("score"), reverse=True)
         return [image["file_path"] for image in images]
 

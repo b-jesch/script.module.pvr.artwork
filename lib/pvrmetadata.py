@@ -2,6 +2,7 @@
     This module is mainly inspired from the script.module.metadatautils from Marcel van der Veldt
     and other contributors. This modules use a subset from metadatautils reduced to PVR related content.
 """
+import xbmc
 import xbmcgui
 import xbmcvfs
 import os
@@ -41,8 +42,6 @@ def download_artwork(folderpath, artwork, dict_arttypes):
                     image = download_image(os.path.join(folderpath, "poster%s.jpg" % str(count + 1)), image)
                     images.append(image)
                 art[key] = images
-            else:
-                art[key] = item[key]
     return art
 
 
@@ -210,7 +209,7 @@ class PVRMetaData(object):
             if posters: details['art'].update({'posters': posters})
             details.update({'path': title_path})
 
-        if details: log('fetch artwork from %s' % title_path)
+        if details: log('fetch artwork from %s' % title_path, type=xbmc.LOGINFO)
         return details
 
     def lookup_local_library(self, title, media_type):
@@ -293,7 +292,7 @@ class PVRMetaData(object):
         if details and ADDON.getSetting('log_results') == 'true':
             log('fetch data for \'%s\' in %s database:' % (title, media_type), pretty_print=details)
         else:
-            log('no results in local databases')
+            log('no results in local databases', type=xbmc.LOGINFO)
 
         return details
 
@@ -452,8 +451,8 @@ class PVRMetaData(object):
         cache_str = "pvr_artwork.%s.%s" % (searchtitle, pure_channelname(channel).lower())
         cache = self.cache.get(cache_str)
 
-        if cache and channel and not manual_select and not ignore_cache:
-            log("fetch data from cache: %s" % cache_str)
+        if cache and channel and not (manual_select or ignore_cache):
+            log("fetch data from cache: %s" % cache_str, type=xbmc.LOGINFO)
             details = cache
             if ADDON.getSetting('log_results') == 'true':
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
@@ -516,10 +515,11 @@ class PVRMetaData(object):
             details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
 
             # do TMDB scraping if enabled and no arts in previous lookups
-            if ADDON.getSetting("use_tmdb").lower() == "true" and not details['art'] \
-                    and ADDON.getSetting('tmdb_apikey'):
+            if ADDON.getSetting("use_tmdb").lower() == "true" and ADDON.getSetting('tmdb_apikey') and \
+                    ((details['art'] and ignore_cache) or not details['art']):
 
-                log("scraping metadata from TMDB for title: %s (media type: %s)" % (searchtitle, details["media_type"]))
+                log("scraping metadata from TMDB for title: %s (media type: %s)" %
+                    (searchtitle, details["media_type"]), type=xbmc.LOGINFO)
                 tmdb_result = self.get_tmdb_details(title=searchtitle, preftype=details["media_type"], year=year,
                                                     manual_select=manual_select, ignore_cache=manual_select)
                 if tmdb_result:
@@ -533,13 +533,12 @@ class PVRMetaData(object):
                     thumb = details["thumbnail"]
                 else:
                     for item in details['art']:
-                        if 'landscape' in item: thumb = item["landscape"]
-                        elif 'fanart' in item: thumb = item["fanart"]
-                        elif 'poster' in item: thumb = item["poster"]
+                        if item == 'fanart': thumb = item
+                        elif item == 'poster': thumb = item
                         if thumb: break
                 if thumb:
                     details.update({'thumbnail': thumb})
-                    details["art"].append({'thumb': thumb})
+                    details["art"].update({'thumb': thumb})
 
                 # download artwork to custom folder
                 if ADDON.getSetting("pvr_art_download").lower() == "true":
@@ -553,7 +552,8 @@ class PVRMetaData(object):
                 details.update({'premiered': convert_date(details.get('premiered'))})
             if details.get('cast', False):
                 cast_and_role = list()
-                for cast in details['cast']: cast_and_role.append('%s (%s)' % (cast['name'], cast['role']))
+                for cast in details['cast']:
+                    if cast['role']: cast_and_role.append('%s (%s)' % (cast['name'], cast['role']))
                 details.update({'castandrole': cast_and_role})
 
             if ADDON.getSetting('log_results') == 'true':

@@ -192,24 +192,24 @@ class PVRMetaData(object):
 
         # ToDo: Grab artists if an .artists folder exists
 
-        details = dict()
+        details = dict({'art': {}})
         fanarts = list()
         posters = list()
         title_path = self.get_custom_path(searchtitle, title)
         if title_path and xbmcvfs.exists(title_path):
             # we have found a folder for the title, look for artwork
             files = xbmcvfs.listdir(title_path)[1]
-            for item in files:
-                if item.split('.')[0] in self.dict_arttypes:
-                    details.update({'art': {item.split('.')[0]: os.path.join(title_path, item)}})
-            for e in range(1, 6):
-                if ('fanart%s.jpg' % e) in files: fanarts.append(os.path.join(title_path, 'fanart%s.jpg' % e))
-                if ('poster%s.jpg' % e) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % e))
-            if fanarts: details.update({'art': {'fanarts': fanarts}})
-            if posters: details.update({'art': {'posters': posters}})
+            for image in files:
+                if image.split('.')[0] in self.dict_arttypes:
+                    details['art'].update({image.split('.')[0]: os.path.join(title_path, image)})
+            for n in range(1, 6):
+                if ('fanart%s.jpg' % n) in files: fanarts.append(os.path.join(title_path, 'fanart%s.jpg' % n))
+                if ('poster%s.jpg' % n) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % n))
+            details['art'].update({'fanarts': fanarts})
+            details['art'].update({'posters': posters})
             details.update({'path': title_path})
 
-        if details: log('fetch artwork from %s' % title_path, type=xbmc.LOGINFO)
+        if details.get('path', False): log('fetch artwork from %s' % title_path, type=xbmc.LOGINFO)
         return details
 
     def lookup_local_library(self, title, media_type):

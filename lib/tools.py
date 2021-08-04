@@ -9,12 +9,13 @@ from urllib.parse import unquote
 
 ADDON = xbmcaddon.Addon(id='script.module.pvr.artwork')
 ADDON_ID = ADDON.getAddonInfo('id')
+ADDON_VERSION = ADDON.getAddonInfo('version')
 LOC = ADDON.getLocalizedString
 PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
 
 LANGUAGE = xbmc.getLanguage(xbmc.ISO_639_1)
 if not LANGUAGE: LANGUAGE = "en"
-
+DB_PREFIX = '%s.%s' % (ADDON_ID, ADDON_VERSION)
 
 def jsonrpc(query):
     """

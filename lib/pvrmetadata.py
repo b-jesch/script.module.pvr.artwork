@@ -25,23 +25,22 @@ def download_artwork(folderpath, artwork, dict_arttypes):
     """
     art = {}
     if artwork and not xbmcvfs.exists(folderpath): xbmcvfs.mkdir(folderpath)
-    for item in artwork:
-        for key in item:
-            if key in dict_arttypes: art[key] = download_image(os.path.join(folderpath, dict_arttypes[key]), item[key])
-            elif key == "fanarts":
-                images = list()
-                for count, image in enumerate(item[key]):
-                    if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
-                    image = download_image(os.path.join(folderpath, "fanart%s.jpg" % str(count + 1)), image)
-                    images.append(image)
-                art[key] = images
-            elif key == "posters":
-                images = list()
-                for count, image in enumerate(item[key]):
-                    if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
-                    image = download_image(os.path.join(folderpath, "poster%s.jpg" % str(count + 1)), image)
-                    images.append(image)
-                art[key] = images
+    for [item, value] in artwork.items():
+        if item in dict_arttypes: art.update({item: download_image(os.path.join(folderpath, dict_arttypes[item]), value)})
+        elif item == "fanarts":
+            images = list()
+            for count, image in enumerate(value):
+                if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
+                image = download_image(os.path.join(folderpath, "fanart%s.jpg" % str(count + 1)), image)
+                images.append(image)
+            art[item] = images
+        elif item == "posters":
+            images = list()
+            for count, image in enumerate(value):
+                if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
+                image = download_image(os.path.join(folderpath, "poster%s.jpg" % str(count + 1)), image)
+                images.append(image)
+            art[item] = images
     return art
 
 
@@ -150,6 +149,7 @@ class PVRMetaData(object):
 
     def __init__(self):
         self.cache = simplecache.SimpleCache()
+        self.cache_str = ''
         self.tmdb = Tmdb()
         self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart,jpg',
                               'banner': 'banner.jpg', 'clearlogo': 'clearlogo.png', 'clearart': 'clearart.png',
@@ -182,7 +182,7 @@ class PVRMetaData(object):
                 details.update({'channel': item['channel'], 'genre': ' / '.join(item['genre'])})
                 break
 
-        self.cache.set("recording.%s" % title, details, expiration=timedelta(days=365))
+        self.cache.set('%s.%s' % (DB_PREFIX, title), details, expiration=timedelta(days=365))
         return details
 
     def lookup_custom_path(self, searchtitle, title):
@@ -192,7 +192,7 @@ class PVRMetaData(object):
 
         # ToDo: Grab artists if an .artists folder exists
 
-        details = dict({'art': {}})
+        details = dict()
         fanarts = list()
         posters = list()
         title_path = self.get_custom_path(searchtitle, title)
@@ -201,12 +201,12 @@ class PVRMetaData(object):
             files = xbmcvfs.listdir(title_path)[1]
             for item in files:
                 if item.split('.')[0] in self.dict_arttypes:
-                    details['art'][item.split('.')[0]] = os.path.join(title_path, item)
+                    details.update({'art': {item.split('.')[0]: os.path.join(title_path, item)}})
             for e in range(1, 6):
                 if ('fanart%s.jpg' % e) in files: fanarts.append(os.path.join(title_path, 'fanart%s.jpg' % e))
                 if ('poster%s.jpg' % e) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % e))
-            if fanarts: details['art'].update({'fanarts': fanarts})
-            if posters: details['art'].update({'posters': posters})
+            if fanarts: details.update({'art': {'fanarts': fanarts}})
+            if posters: details.update({'art': {'posters': posters}})
             details.update({'path': title_path})
 
         if details: log('fetch artwork from %s' % title_path, type=xbmc.LOGINFO)
@@ -233,7 +233,7 @@ class PVRMetaData(object):
                                 'art': result['tvshows'][0]['art'], 'genre': result['tvshows'][0]['genre'],
                                 'studio': result['tvshows'][0]['studio'],
                                 'premiered': result['tvshows'][0]['premiered'], 'mpaa': result['tvshows'][0]['mpaa'],
-                                'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow'})
+                                'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow', 'is_db': True})
                 media_type = 'tvshow'
 
         if not details and (not media_type or media_type == "movie"):
@@ -251,7 +251,7 @@ class PVRMetaData(object):
                                 'writer': result['movies'][0]['writer'], 'genre': result['movies'][0]['genre'],
                                 'country': result['movies'][0]['country'], 'studio': result['movies'][0]['studio'],
                                 'premiered': result['movies'][0]['premiered'], 'mpaa': result['movies'][0]['mpaa'],
-                                'ratings': result['movies'][0]['ratings'], 'media_type': 'movie'})
+                                'ratings': result['movies'][0]['ratings'], 'media_type': 'movie',  'is_db': True})
                 media_type = 'movie'
 
         # unquote item values
@@ -269,7 +269,6 @@ class PVRMetaData(object):
 
         # repack extra fanarts, extraposters into list objects and unquote item values
 
-        if 'art' in details:
             fanarts = list()
             posters = list()
             rm_items = list()
@@ -447,19 +446,21 @@ class PVRMetaData(object):
         # try cache first
         # use cleantitle when searching cache
 
-        searchtitle = self.cleanup_title(title.lower())
-        cache_str = "pvr_artwork.%s.%s" % (searchtitle, pure_channelname(channel).lower())
-        cache = self.cache.get(cache_str)
+        if not title: return
 
-        if cache and channel and not (manual_select or ignore_cache):
-            log("fetch data from cache: %s" % cache_str, type=xbmc.LOGINFO)
+        searchtitle = self.cleanup_title(title.lower())
+        self.cache_str = "%s.%s" % (DB_PREFIX, searchtitle)
+        cache = self.cache.get(self.cache_str)
+
+        if cache and not (manual_select or ignore_cache):
+            log("fetch data from cache: %s" % self.cache_str, type=xbmc.LOGINFO)
             details = cache
             if ADDON.getSetting('log_results') == 'true':
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
             return details
         else:
             # no cache - start our lookup adventure
-            log("no data in cache - start lookup: %s" % cache_str)
+            log("no cache or manual select/ignore cache - start lookup: %s" % self.cache_str)
 
             # workaround for recordings
             recording = self.lookup_local_recording(title)
@@ -470,7 +471,7 @@ class PVRMetaData(object):
                     genre = recording["genre"]
                     channel = recording["channel"]
 
-            details = dict({'pvrtitle': title, 'pvrchannel': channel, 'pvrgenre': genre, 'cache_str': cache_str,
+            details = dict({'title': title, 'channel': channel, 'genre': genre,
                             'media_type': '', 'art': dict()})
             if art: details.update({'thumbnail': art})
 
@@ -510,6 +511,14 @@ class PVRMetaData(object):
 
             # lookup movie/tv library
             details = extend_dict(details, self.lookup_local_library(searchtitle, details["media_type"]))
+            if details.get('is_db', False):
+
+                if ADDON.getSetting('log_results') == 'true':
+                    log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
+
+                log("store data in cache - %s " % self.cache_str)
+                self.cache.set(self.cache_str, details, expiration=timedelta(days=365))
+                return details
 
             # lookup custom path
             details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
@@ -523,33 +532,29 @@ class PVRMetaData(object):
                 tmdb_result = self.get_tmdb_details(title=searchtitle, preftype=details["media_type"], year=year,
                                                     manual_select=manual_select, ignore_cache=manual_select)
                 if tmdb_result:
-                    details["media_type"] = tmdb_result["media_type"]
                     details = extend_dict(details, tmdb_result)
+                    details["media_type"] = tmdb_result["media_type"]
                 elif ignore_cache:
                     xbmcgui.Dialog().notification(LOC(32001), LOC(32021), xbmcgui.NOTIFICATION_WARNING)
 
                 thumb = ''
-                if 'thumbnail' in details:
-                    thumb = details["thumbnail"]
+                if 'thumbnail' in details: thumb = details["thumbnail"]
                 else:
-                    for item in details['art']:
-                        if item == 'fanart': thumb = item
-                        elif item == 'poster': thumb = item
+                    for [item, value] in details['art'].items():
+                        if item == 'fanart': thumb = value
+                        elif item == 'poster': thumb = value
                         if thumb: break
-                if thumb:
-                    details.update({'thumbnail': thumb})
-                    details["art"].update({'thumb': thumb})
+
+                if thumb: details.update({'thumbnail': thumb})
 
                 # download artwork to custom folder
                 if ADDON.getSetting("pvr_art_download").lower() == "true":
                     details.update({'path': self.get_custom_path(searchtitle, title)})
                     details["art"] = download_artwork(details['path'], details["art"], self.dict_arttypes)
 
-            if details.get("runtime", False):
-                details["runtime"] = details["runtime"] / 60
-                details.update({'runtime': self.calc_duration(details["runtime"])})
-            if details.get('premiered', False):
-                details.update({'premiered': convert_date(details.get('premiered'))})
+            if details.get("runtime", False): details.update({'runtime': self.calc_duration(details["runtime"] / 60)})
+            if details.get('premiered', False): details.update({'premiered': convert_date(details.get('premiered'))})
+
             if details.get('cast', False):
                 cast_and_role = list()
                 for cast in details['cast']:
@@ -560,8 +565,8 @@ class PVRMetaData(object):
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
 
         # always store result in cache
-        log("store data in cache - %s " % cache_str)
-        self.cache.set(cache_str, details, expiration=timedelta(days=365))
+        log("store data in cache - %s " % self.cache_str)
+        self.cache.set(self.cache_str, details, expiration=timedelta(days=365))
         return details
 
     # Main entry from context menu call
@@ -635,5 +640,5 @@ class PVRMetaData(object):
         if changemade:
             details["art"] = artwork
             # save results in cache
-            self.cache.set(details['cache_str'], details, expiration=timedelta(days=365))
+            self.cache.set(self.cache_str, details, expiration=timedelta(days=365))
         return details

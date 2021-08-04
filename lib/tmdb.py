@@ -182,7 +182,7 @@ class Tmdb(object):
         details = {"tmdb_id": data["id"], "rating": '%s (TMDB)' % data["vote_average"], "votes": data["vote_count"],
                    "popularity": data["popularity"] * 1000, "popularity.tmdb": data["popularity"] * 1000,
                    "plot": data["overview"], "genre": [item["name"] for item in data["genres"]],
-                   "status": data["status"], "cast": [], "art": [], "writer": [], "director": [],
+                   "status": data["status"], "cast": [], "writer": [], "director": [],
                    "media_type": media_type}
         # cast
         if "credits" in data:
@@ -199,17 +199,19 @@ class Tmdb(object):
 
         # artwork
         if data.get("images", False):
-            if data["images"].get("backdrops"):
+            artwork = dict()
+            if data["images"].get("backdrops", False):
                 fanarts = self.get_best_images(data['images']['backdrops'])
-                details["art"].append({'fanart': fanarts[0]})
-                details["art"].append({'fanarts': fanarts[1:]})
-            if data["images"].get("posters"):
+                artwork.update({'fanart': fanarts[0]})
+                artwork.update({'fanarts': fanarts[1:]})
+            if data["images"].get("posters", False):
                 posters = self.get_best_images(data["images"]["posters"])
-                details["art"].append({'poster': posters[0]})
-                details["art"].append({'posters': posters[1:]})
-            if data["images"].get('logos'):
+                artwork.update({'poster': posters[0]})
+                artwork.update({'posters': posters[1:]})
+            if data["images"].get('logos', False):
                 logos = self.get_best_images(data['images']['logos'], size='w500')
-                details['art'].append({'clearlogo': logos[0]})
+                artwork.update({'clearlogo': logos[0]})
+            details.update({'art': artwork})
         return details
 
     @staticmethod

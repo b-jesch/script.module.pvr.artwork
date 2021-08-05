@@ -15,7 +15,8 @@ PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
 
 LANGUAGE = xbmc.getLanguage(xbmc.ISO_639_1)
 if not LANGUAGE: LANGUAGE = "en"
-DB_PREFIX = '%s.%s' % (ADDON_ID, ADDON_VERSION)
+DB_VERSION = '1.0.9'
+DB_PREFIX = '%s.%s' % (ADDON_ID, DB_VERSION)
 
 def jsonrpc(query):
     """

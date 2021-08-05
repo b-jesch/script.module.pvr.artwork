@@ -182,7 +182,7 @@ class PVRMetaData(object):
                 details.update({'channel': item['channel'], 'genre': ' / '.join(item['genre'])})
                 break
 
-        self.cache.set('%s.%s' % (DB_PREFIX, title), details, expiration=timedelta(days=365))
+        if details: self.cache.set('recording.%s' % title, details, expiration=timedelta(days=365))
         return details
 
     def lookup_custom_path(self, searchtitle, title):
@@ -364,11 +364,10 @@ class PVRMetaData(object):
         if ADDON.getSetting("pvr_art_recordings_only") == "true" and not recordingdetails:
             filters.append("PVR Artwork is enabled for recordings only")
         if filters:
-            filterstr = " - ".join(filters)
-            log("Filter active for title: %s - channel %s --> %s" % (title, channel, filterstr))
-            return filterstr
+            log("Filter active for title: %s (%s): %s" % (title, channel, ' - '.join(filters)))
+            return True
         else:
-            return ""
+            return False
 
     @staticmethod
     def get_mediatype_from_genre(genre):
@@ -412,13 +411,13 @@ class PVRMetaData(object):
             return {'Duration': '%s:%s' % (hours, mins), 'Runtime': int(duration)}
 
     def get_tmdb_details(self, imdb_id=None, tvdb_id=None, title=None, year=None, media_type=None,
-                         preftype=None, manual_select=False, ignore_cache=False):
+                         preftype=None, manual_select=False):
         """
             returns details from tmdb
         """
         log('Fetch items from tmdb: ImdbId: %s, TvdbId: %s, title: %s, year: %s, '
-            'mediatype: %s, preferred type: %s, manual selection: %s, ignore cache: %s' %
-            (imdb_id, tvdb_id, title, year, media_type, preftype, manual_select, ignore_cache))
+            'mediatype: %s, preferred type: %s, manual selection: %s' %
+            (imdb_id, tvdb_id, title, year, media_type, preftype, manual_select))
 
         result = dict()
         if imdb_id:
@@ -482,22 +481,22 @@ class PVRMetaData(object):
                 log("Genre is unknown, ignore....")
             else:
                 details.update({'genre': genre.split(' / '), 'media_type': self.get_mediatype_from_genre(genre)})
-            searchtitle = self.cleanup_title(title.lower())
 
             # only continue if we pass our basic checks
             excluded = self.pvr_proceed_lookup(title, channel, genre, recording)
-            proceed_lookup = False if excluded else True
-
-            if not proceed_lookup and manual_select:
+            proceed = False
+            if excluded and manual_select:
                 # warn user about active skip filter
-                proceed_lookup = xbmcgui.Dialog().yesno(message=LOC(32027), heading=LOC(750))
-            if not proceed_lookup: return
+                proceed = xbmcgui.Dialog().yesno(message=LOC(32027), heading=LOC(750))
+            if excluded and (manual_select and not proceed): return
 
             # if manual lookup get the title from the user
             if manual_select:
                 searchtitle = xbmcgui.Dialog().input(xbmc.getLocalizedString(16017), searchtitle,
                                                      type=xbmcgui.INPUT_ALPHANUM)
-                if not searchtitle: return
+                if not searchtitle:
+                    log('manual selection aborted')
+                    return
 
             # if manual lookup and no mediatype, ask the user
             if manual_select and not details["media_type"]:
@@ -530,7 +529,7 @@ class PVRMetaData(object):
                 log("scraping metadata from TMDB for title: %s (media type: %s)" %
                     (searchtitle, details["media_type"]), type=xbmc.LOGINFO)
                 tmdb_result = self.get_tmdb_details(title=searchtitle, preftype=details["media_type"], year=year,
-                                                    manual_select=manual_select, ignore_cache=manual_select)
+                                                    manual_select=manual_select)
                 if tmdb_result:
                     details = extend_dict(details, tmdb_result)
                     details["media_type"] = tmdb_result["media_type"]

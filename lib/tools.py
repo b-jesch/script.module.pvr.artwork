@@ -18,6 +18,7 @@ if not LANGUAGE: LANGUAGE = "en"
 DB_VERSION = '1.0.9'
 DB_PREFIX = '%s.%s' % (ADDON_ID, DB_VERSION)
 
+
 def jsonrpc(query):
     """
         perform a JSON-RPC query

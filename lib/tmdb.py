@@ -183,7 +183,7 @@ class Tmdb(object):
                    "popularity": data["popularity"] * 1000, "popularity.tmdb": data["popularity"] * 1000,
                    "plot": data["overview"], "genre": [item["name"] for item in data["genres"]],
                    "status": data["status"], "cast": [], "writer": [], "director": [],
-                   "media_type": media_type}
+                   "production": data["production_companies"], "media_type": media_type}
         # cast
         if "credits" in data:
             if "cast" in data["credits"]:

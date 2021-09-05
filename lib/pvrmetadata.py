@@ -63,9 +63,9 @@ def download_image(filename, url):
             try:
                 cache_image = connection.execute('SELECT cachedurl FROM texture WHERE url = ?', (filename,)).fetchone()
                 if cache_image and isinstance(cache_image, str):
-                    if xbmcvfs.exists(cache_image):
-                        xbmcvfs.delete("special://profile/Thumbnails/%s" % cache_image)
+                    if xbmcvfs.exists(cache_image): xbmcvfs.delete("special://profile/Thumbnails/%s" % cache_image)
                     connection.execute('DELETE FROM texture WHERE url = ?', (filename,))
+                    log('Image \'%s\' from texture cache deleted' % cache_image)
                 connection.close()
             except Exception as e:
                 log(str(e), xbmc.LOGERROR)

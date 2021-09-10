@@ -145,6 +145,23 @@ def manual_set_artwork(artwork, dict_arttypes):
     return changemade, artwork
 
 
+def create_castandrole(cast):
+    """
+        creates a list in format 'actor (role)'
+    """
+    cast_and_role = list()
+    for item in cast:
+        if item['role']: cast_and_role.append('%s (%s)' % (item['name'], item['role']))
+    return cast_and_role
+
+
+def get_studiologo(studios):
+    for studio in studios:
+        studiologo = ('%s%s.png') % (xbmc.getInfoLabel('Skin.String(studiologos.path)'), studio)
+        if xbmcvfs.exists(studiologo): return studiologo
+    return ''
+
+
 class PVRMetaData(object):
 
     def __init__(self):
@@ -182,7 +199,8 @@ class PVRMetaData(object):
                 details.update({'channel': item['channel'], 'genre': ' / '.join(item['genre'])})
                 break
 
-        if details: self.cache.set('recording.%s' % title, details, expiration=timedelta(days=365))
+        if details: self.cache.set('recording.%s' % title, details,
+                                   expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
         return details
 
     def lookup_custom_path(self, searchtitle, title):
@@ -254,11 +272,13 @@ class PVRMetaData(object):
                                 'ratings': result['movies'][0]['ratings'], 'media_type': 'movie',  'is_db': True})
                 media_type = 'movie'
 
-        # unquote item values
+        # unquote item values, create CastAndRole
 
         if 'cast' in details:
             for item in details['cast']:
                 if item.get('thumbnail', False): item.update({'thumbnail': url_unquote(item.get('thumbnail', ''))})
+
+            details.update({'castandrole': create_castandrole(details['cast'])})
 
         if 'ratings' in details:
             rating = list()
@@ -267,7 +287,11 @@ class PVRMetaData(object):
                     rating.append('%s (%s)' % (round(details['ratings'][item]['rating'], 1), self.dict_providers[item]))
             if rating: details.update({'rating': rating})
 
-        # repack extra fanarts, extraposters into list objects and unquote item values
+            # get studio logos graphics from studios depending on ressource images
+
+            if details.get('studio', False): details.update({'studiologo': get_studiologo(details['studio'])})
+
+            # repack extra fanarts, extraposters into list objects and unquote item values
 
             fanarts = list()
             posters = list()
@@ -488,7 +512,9 @@ class PVRMetaData(object):
             if excluded and manual_select:
                 # warn user about active skip filter
                 proceed = xbmcgui.Dialog().yesno(message=LOC(32027), heading=LOC(750))
-            if excluded and (manual_select and not proceed): return
+            if excluded:
+                if not manual_select: return False
+                if not proceed: return False
 
             # if manual lookup get the title from the user
             if manual_select:
@@ -496,7 +522,7 @@ class PVRMetaData(object):
                                                      type=xbmcgui.INPUT_ALPHANUM)
                 if not searchtitle:
                     log('manual selection aborted')
-                    return
+                    return False
 
             # if manual lookup and no mediatype, ask the user
             if manual_select and not details["media_type"]:
@@ -516,7 +542,8 @@ class PVRMetaData(object):
                     log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
 
                 log("store data in cache - %s " % self.cache_str)
-                self.cache.set(self.cache_str, details, expiration=timedelta(days=365))
+                self.cache.set(self.cache_str, details,
+                               expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
                 return details
 
             # lookup custom path
@@ -553,19 +580,18 @@ class PVRMetaData(object):
 
             if details.get("runtime", False): details.update({'runtime': self.calc_duration(details["runtime"] / 60)})
             if details.get('premiered', False): details.update({'premiered': convert_date(details.get('premiered'))})
-
-            if details.get('cast', False):
-                cast_and_role = list()
-                for cast in details['cast']:
-                    if cast['role']: cast_and_role.append('%s (%s)' % (cast['name'], cast['role']))
-                details.update({'castandrole': cast_and_role})
+            if details.get('cast', False): details.update({'castandrole': create_castandrole(details['cast'])})
 
             if ADDON.getSetting('log_results') == 'true':
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
 
+            # get studio logos graphics from studios depending on ressource images
+            if details.get('studio', False): details.update({'studiologo': get_studiologo(details['studio'])})
+
         # always store result in cache
         log("store data in cache - %s " % self.cache_str)
-        self.cache.set(self.cache_str, details, expiration=timedelta(days=365))
+        self.cache.set(self.cache_str, details,
+                       expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
         return details
 
     # Main entry from context menu call
@@ -582,6 +608,8 @@ class PVRMetaData(object):
 
         ignorechannels = split_addonsetting('pvr_art_ignore_channels', ', ')
         ignoretitles = split_addonsetting('pvr_art_ignore_titles', ', ')
+        ignoregenres = split_addonsetting('pvr_art_ignore_genres', ', ')
+        genres = genre.split(' / ')
 
         if channel in ignorechannels:
             options.append(LOC(32030))  # Remove channel from ignore list
@@ -591,6 +619,11 @@ class PVRMetaData(object):
             options.append(LOC(32032))  # Remove title from ignore list
         else:
             options.append(LOC(32033))  # Add title to ignore list
+        for genre in genres:
+            if genre in ignoregenres:
+                if LOC(32046) not in options: options.append(LOC(32046))  # Remove genre(s) from ignorelist
+            else:
+                if LOC(32047) not in options: options.append(LOC(32047))  # Add genre(s) from ignorelist
 
         options.append(LOC(32034))  # Open addon settings
 
@@ -626,6 +659,14 @@ class PVRMetaData(object):
                 ignoretitles.append(title)
             ADDON.setSetting("pvr_art_ignore_titles", ', '.join(ignoretitles))
         elif dialog == 5:
+            # Add/remove genre(s) to ignore list
+            for genre in genres:
+                if genre in ignoregenres:
+                    ignoregenres.remove(genre)
+                else:
+                    ignoregenres.append(genre)
+            ADDON.setSetting("pvr_art_ignore_genres", ', '.join(ignoregenres))
+        elif dialog == 6:
             # Open addon settings
             xbmc.executebuiltin("Addon.OpenSettings(%s)" % ADDON_ID)
 
@@ -639,5 +680,6 @@ class PVRMetaData(object):
         if changemade:
             details["art"] = artwork
             # save results in cache
-            self.cache.set(self.cache_str, details, expiration=timedelta(days=365))
+            self.cache.set(self.cache_str, details,
+                           expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
         return details

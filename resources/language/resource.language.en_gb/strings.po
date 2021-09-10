@@ -191,7 +191,15 @@ msgctxt "#32045"
 msgid "Canceled"
 msgstr ""
 
-# empty strings 32046 - 32051
+msgctxt "#32046"
+msgid "Remove genre from ignore list"
+msgstr ""
+
+msgctxt "#32047"
+msgid "Add genre to ignore list"
+msgstr ""
+
+# empty strings 32048 - 32051
 
 msgctxt "#32052"
 msgid "TMDB API Key"
@@ -205,3 +213,18 @@ msgctxt "#32054"
 msgid "Personal API-Key for TMDB"
 msgstr ""
 
+msgctxt "#32055"
+msgid "Store Items in Cache for"
+msgstr ""
+
+msgctxt "#32056"
+msgid "90 Days"
+msgstr ""
+
+msgctxt "#32057"
+msgid "180 Days"
+msgstr ""
+
+msgctxt "#32058"
+msgid "360 Days"
+msgstr ""

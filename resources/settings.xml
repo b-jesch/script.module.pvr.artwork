@@ -8,6 +8,7 @@
 		<setting id="pvr_art_download" type="bool" label="32007" default="true" enable="eq(-1,true)" />
 		<setting id="pvr_art_custom_path" type="folder" label="32006" source="auto" enable="eq(-2,true) + eq(-1,true)" />
 		<setting id="pvr_art_max_downloads" type="enum" label="32016" values="1|2|3|4|5" default="2" enable="eq(-3,true) + eq(-2,true)"/>
+		<setting id="cache_lifetime" type="labelenum" label="32055" lvalues="32056|32057|32058" />
 	</category>
 	<category id="pvr_tuning" label="32008">
         <setting type="lsep" label="32009" />

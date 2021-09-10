@@ -44,6 +44,8 @@ def get_json(url, params=None):
         response.raise_for_status()
         if response and response.content:
             data = json.loads(response.content)
+            if ADDON.getSetting('log_results') == 'true':
+                log('Result of TMDB database query', pretty_print=data.get('results', data))
             return data.get('results', data)
 
     except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:

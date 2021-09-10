@@ -107,7 +107,6 @@ msgstr "Inhalt festlegen"
 
 # empty strings 32023 - 32024
 
-
 msgctxt "#32025"
 msgid "Ignore Genres"
 msgstr "Ignoriere Genres"
@@ -192,7 +191,15 @@ msgctxt "#32045"
 msgid "Canceled"
 msgstr "Abgesetzt"
 
-# empty strings 32046 - 32051
+msgctxt "#32046"
+msgid "Remove genre from ignore list"
+msgstr "Entferne Genre von Ausschlussliste"
+
+msgctxt "#32047"
+msgid "Add genre to ignore list"
+msgstr "Füge Genre zur Ausschlussliste hinzu"
+
+# empty strings 32048 - 32051
 
 msgctxt "#32052"
 msgid "TMDB API Key"
@@ -205,3 +212,19 @@ msgstr "Freischaltung der TMDB-Suche mit einem persönlichen API Key"
 msgctxt "#32054"
 msgid "Personal API-Key for TMDB"
 msgstr "Persönlicher TMDB API-Key"
+
+msgctxt "#32055"
+msgid "Store Items in Cache for"
+msgstr "Speichere Einträge im Cache für"
+
+msgctxt "#32056"
+msgid "90 Days"
+msgstr "90 Tage"
+
+msgctxt "#32057"
+msgid "180 Days"
+msgstr "180 Tage"
+
+msgctxt "#32058"
+msgid "360 Days"
+msgstr "360 Tage"

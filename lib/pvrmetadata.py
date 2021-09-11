@@ -162,6 +162,13 @@ def get_studiologo(studios):
     return ''
 
 
+def get_cache_lifetime():
+    try:
+        return int(ADDON.getSetting('cache_lifetime').split()[0])
+    except IndexError:
+        return 180
+
+
 class PVRMetaData(object):
 
     def __init__(self):
@@ -199,8 +206,7 @@ class PVRMetaData(object):
                 details.update({'channel': item['channel'], 'genre': ' / '.join(item['genre'])})
                 break
 
-        if details: self.cache.set('recording.%s' % title, details,
-                                   expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
+        if details: self.cache.set('recording.%s' % title, details, expiration=timedelta(days=get_cache_lifetime()))
         return details
 
     def lookup_custom_path(self, searchtitle, title):
@@ -543,7 +549,7 @@ class PVRMetaData(object):
 
                 log("store data in cache - %s " % self.cache_str)
                 self.cache.set(self.cache_str, details,
-                               expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
+                               expiration=timedelta(days=get_cache_lifetime()))
                 return details
 
             # lookup custom path
@@ -590,8 +596,7 @@ class PVRMetaData(object):
 
         # always store result in cache
         log("store data in cache - %s " % self.cache_str)
-        self.cache.set(self.cache_str, details,
-                       expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
+        self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
         return details
 
     # Main entry from context menu call
@@ -680,6 +685,5 @@ class PVRMetaData(object):
         if changemade:
             details["art"] = artwork
             # save results in cache
-            self.cache.set(self.cache_str, details,
-                           expiration=timedelta(days=int(ADDON.getSetting('cache_lifetime').split()[0])))
+            self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
         return details

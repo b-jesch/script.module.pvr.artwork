@@ -2,7 +2,7 @@
     This module is mainly inspired from the script.module.metadatautils from Marcel van der Veldt
     and other contributors. This modules use a subset from metadatautils reduced to PVR related content.
 """
-import xbmc
+
 import xbmcgui
 import xbmcvfs
 import os
@@ -157,7 +157,7 @@ def create_castandrole(cast):
 
 def get_studiologo(studios):
     for studio in studios:
-        studiologo = ('%s%s.png') % (xbmc.getInfoLabel('Skin.String(studiologos.path)'), studio)
+        studiologo = '%s%s.png' % (xbmc.getInfoLabel('Skin.String(studiologos.path)'), studio)
         if xbmcvfs.exists(studiologo): return studiologo
     return ''
 
@@ -246,7 +246,7 @@ class PVRMetaData(object):
         if not media_type or media_type == "tvshow":
             query = {'method': 'VideoLibrary.GetTVShows',
                      'params': {'properties': ['cast', 'file', 'art', 'genre', 'studio', 'premiered', 'mpaa',
-                                               'ratings'],
+                                               'ratings', 'plot'],
                                 'limits': {'start': 0, 'end': 1},
                                 'filter': {'operator': 'is', 'field': 'title', 'value': title}
                                 }
@@ -255,7 +255,7 @@ class PVRMetaData(object):
             if result and len(result['tvshows']) > 0:
                 details.update({'cast': result['tvshows'][0]['cast'], 'path': result['tvshows'][0]['file'],
                                 'art': result['tvshows'][0]['art'], 'genre': result['tvshows'][0]['genre'],
-                                'studio': result['tvshows'][0]['studio'],
+                                'studio': result['tvshows'][0]['studio'], 'description': result['tvshows'][0]['plot'],
                                 'premiered': result['tvshows'][0]['premiered'], 'mpaa': result['tvshows'][0]['mpaa'],
                                 'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow', 'is_db': True})
                 media_type = 'tvshow'
@@ -547,9 +547,8 @@ class PVRMetaData(object):
                 if ADDON.getSetting('log_results') == 'true':
                     log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
 
-                log("store data in cache - %s " % self.cache_str)
-                self.cache.set(self.cache_str, details,
-                               expiration=timedelta(days=get_cache_lifetime()))
+                log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
+                self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
                 return details
 
             # lookup custom path
@@ -595,7 +594,7 @@ class PVRMetaData(object):
             if details.get('studio', False): details.update({'studiologo': get_studiologo(details['studio'])})
 
         # always store result in cache
-        log("store data in cache - %s " % self.cache_str)
+        log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
         self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
         return details
 
@@ -685,5 +684,6 @@ class PVRMetaData(object):
         if changemade:
             details["art"] = artwork
             # save results in cache
+            log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
             self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
         return details

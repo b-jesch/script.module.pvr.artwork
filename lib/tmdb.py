@@ -181,10 +181,13 @@ class Tmdb(object):
             return {}
         details = {"tmdb_id": data["id"], "rating": '%s (TMDB)' % data["vote_average"], "votes": data["vote_count"],
                    "popularity": data["popularity"] * 1000, "popularity.tmdb": data["popularity"] * 1000,
-                   "plot": data["overview"], "genre": [item["name"] for item in data["genres"]],
+                   "genre": [item["name"] for item in data["genres"]],
                    "country": [item['name'] for item in data["production_countries"]], "status": data["status"],
                    "cast": [], "writer": [], "studio": [item['name'] for item in data["production_companies"]],
                    "director": [], "production": data["production_companies"], "media_type": media_type}
+
+        if media_type == 'tvshow': details.update({'description': data['overview']})
+
         # cast
         if "credits" in data:
             if "cast" in data["credits"]:

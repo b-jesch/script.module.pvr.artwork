@@ -30,14 +30,14 @@ def download_artwork(folderpath, artwork, dict_arttypes):
         elif item == "fanarts":
             images = list()
             for count, image in enumerate(value):
-                if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
+                if count >= int(ADDON.getSetting('pvr_art_max_downloads')) - 1: break
                 image = download_image(os.path.join(folderpath, "fanart%s.jpg" % str(count + 1)), image)
                 images.append(image)
             art[item] = images
         elif item == "posters":
             images = list()
             for count, image in enumerate(value):
-                if count >= int(ADDON.getSetting('pvr_art_max_downloads')): break
+                if count >= int(ADDON.getSetting('pvr_art_max_downloads')) - 1: break
                 image = download_image(os.path.join(folderpath, "poster%s.jpg" % str(count + 1)), image)
                 images.append(image)
             art[item] = images

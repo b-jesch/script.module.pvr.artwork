@@ -64,7 +64,7 @@ msgid "Titles to ignore"
 msgstr ""
 
 msgctxt "#32012"
-msgid "Split title on character (use only first part)"
+msgid "Split title on character"
 msgstr ""
 
 msgctxt "#32013"

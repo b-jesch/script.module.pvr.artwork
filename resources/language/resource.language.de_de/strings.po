@@ -53,7 +53,7 @@ msgstr "Feineinstellungen"
 
 msgctxt "#32009"
 msgid "Use ', ' as delimiter to enter multiple values"
-msgstr "Benutze ',' als Trennzeichen für mehrere Werte"
+msgstr "Benutze ', ' als Trennzeichen für mehrere Werte"
 
 msgctxt "#32010"
 msgid "Channels to ignore"
@@ -64,8 +64,8 @@ msgid "Titles to ignore"
 msgstr "Ignoriere Titel"
 
 msgctxt "#32012"
-msgid "Split title on character (use only first part)"
-msgstr "Splitte Titel am Zeichen (benutze nur den ersten Teil)"
+msgid "Split title on character"
+msgstr "Splitte Titel am Zeichen"
 
 msgctxt "#32013"
 msgid "Characters to replace by space in title"
@@ -271,11 +271,11 @@ msgstr "Setze einen Pfad zum Download-Ordner. Dieser kann auch ein Netzwerk-Pfad
 
 msgctxt "#32107"
 msgid "Saves online artwork in a special download folder."
-msgstr "Speichert Online-Artwork in einem speziellen Doenload Ordner."
+msgstr "Speichert Online-Artwork in einem speziellen Download Ordner."
 
 msgctxt "#32110"
 msgid "Define PVR channel names to ignored here (news channels, advertisement, home shopping etc.). Comma separated."
-msgstr "Spezifiziere Sendernamen, die von der Suche ausgeschlossen werden sollen (Nachrichten Kanäle, Werbung, Home Shoppings usw.). Komma getrennt."
+msgstr "Spezifiziere Sendernamen, die von der Suche ausgeschlossen werden sollen (Nachrichten Kanäle, Werbung, Home Shopping usw.). Komma getrennt."
 
 msgctxt "#32111"
 msgid "Define broadcast titles to ignored here (news, advertisement, documentation etc.). Comma separated."

@@ -39,6 +39,7 @@ def get_json(url, params=None):
         get info from a rest api
     """
     if not params: params = dict()
+    else: log('Query TMDB with parameters', pretty_print=params)
 
     try:
         response = requests.get(url, params=params, timeout=20)
@@ -120,5 +121,9 @@ def url_unquote(url):
 
 
 def convert_date(date, date_format='%Y-%m-%d'):
-    dt = time.strptime(date, date_format)
-    return time.strftime(xbmc.getRegion('dateshort'), dt)
+    try:
+        dt = time.strptime(date, date_format)
+        return time.strftime(xbmc.getRegion('dateshort'), dt)
+    except ValueError:
+        log('Could not convert date with wrong format: %s' % date, type=xbmc.LOGERROR)
+        return date

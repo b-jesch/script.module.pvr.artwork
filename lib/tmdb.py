@@ -187,6 +187,7 @@ class Tmdb(object):
                    "director": [], "production": data["production_companies"], "media_type": media_type}
 
         if media_type == 'tvshow': details.update({'description': data['overview']})
+        if "release_date" in data: details.update({"released": data['release_date']})
 
         # cast
         if "credits" in data:

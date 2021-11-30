@@ -584,7 +584,7 @@ class PVRMetaData(object):
                     details["art"] = download_artwork(details['path'], details["art"], self.dict_arttypes)
 
             if details.get("runtime", False): details.update({'runtime': self.calc_duration(details["runtime"] / 60)})
-            if details.get('premiered', False): details.update({'premiered': convert_date(details.get('premiered'))})
+            if details.get('released', False): details.update({'premiered': convert_date(details.get('released'))})
             if details.get('cast', False): details.update({'castandrole': create_castandrole(details['cast'])})
 
             if ADDON.getSetting('log_results') == 'true':

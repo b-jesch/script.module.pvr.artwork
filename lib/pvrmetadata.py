@@ -4,7 +4,6 @@
 """
 
 import xbmcgui
-import xbmcvfs
 import os
 from difflib import SequenceMatcher as SM
 import simplecache
@@ -17,6 +16,11 @@ from datetime import timedelta
 if ADDON.getSetting('pvr_art_custom_path') == '':
     ADDON.setSetting('pvr_art_custom_path', PROFILE)
     log('set artwork costum path to %s' % PROFILE)
+
+labels = list(['director', 'writer', 'genre', 'country', 'studio', 'studiologo', 'premiered', 'mpaa', 'status',
+               'rating', 'castandrole', 'description'])
+
+win = xbmcgui.Window(10000)
 
 
 def download_artwork(folderpath, artwork, dict_arttypes):
@@ -687,3 +691,44 @@ class PVRMetaData(object):
             log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
             self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
         return details
+
+    def clear_properties(self, prefix):
+
+        for item in self.dict_arttypes:
+            win.clearProperty('%s.%s' % (prefix, item))
+            for i in range(1, 6): win.clearProperty('%s.fanart%s' % (prefix, i))
+
+        for label in labels: win.clearProperty('%s.ListItem.%s' % (prefix, label))
+
+        win.clearProperty('%s.present' % prefix)
+        xbmc.log('Properties of %s cleared' % prefix)
+
+    def set_properties(self, prefix, artwork):
+
+        # set artwork properties
+        for item in artwork:
+            if item in self.dict_arttypes: win.setProperty('%s.%s' % (prefix, item), artwork[item])
+
+        # Lookup for fanarts/posters list
+        fanarts = artwork.get('fanarts', False)
+        posters = artwork.get('posters', False)
+        cf = 0
+        if fanarts:
+            for cf, fanart in enumerate(fanarts):
+                if cf > 5: break
+                win.setProperty('%s.fanart%s' % (prefix, str(cf + 1)), fanart)
+            cf += 1
+        if posters and cf < 2:
+            for count, fanart in enumerate(posters):
+                if count > 5: break
+                win.setProperty('%s.fanart%s' % (prefix, str(cf + count + 1)), fanart)
+
+        win.setProperty('%s.present' % prefix, 'true')
+
+    def set_labels(self, prefix, data):
+        # set PVR related list items
+        for label in labels:
+            if data.get(label, False) and data[label]:
+                lvalue = str(data[label])
+                if isinstance(data[label], list): lvalue = ', '.join(data[label])
+                win.setProperty('%s.ListItem.%s' % (prefix, label), lvalue)

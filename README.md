@@ -67,7 +67,7 @@ An example for a service script. All properties are stored within the Home Windo
 - `PVR.Artwork.ListItem.director`
 - `PVR.Artwork.ListItem.castandrole`
 
-and more (see labels below)
+and more (see pvrmetadata.py: line 20)
 
 ### Artwork ###
 - `PVR.Artwork.fanart`
@@ -92,54 +92,7 @@ except ImportError:
 content_types = dict({'MyPVRChannels.xml': 'channels', 'MyPVRGuide.xml': 'channels',
                       'MyPVRRecordings.xml': 'recordings', 'MyPVRTimers.xml': 'timers', 'MyPVRSearch.xml': 'search'})
 
-labels = list(['director', 'writer', 'genre', 'country', 'studio', 'premiered', 'mpaa', 'status',
-               'rating', 'castandrole', description])
-
 win = xbmcgui.Window(10000)
-
-
-def clear_properties(prefix):
-
-    for item in pmd.dict_arttypes:
-        win.clearProperty('%s.%s' % (prefix, item))
-        for i in range(1, 6): win.clearProperty('%s.fanart%s' % (prefix, i))
-
-    for label in labels: win.clearProperty('%s.ListItem.%s' % (prefix, label))
-
-    win.clearProperty('PVR.Artwork.present')
-    xbmc.log('Properties of %s cleared' % prefix)
-
-
-def set_properties(prefix, artwork):
-
-    # set artwork properties
-    for item in artwork:
-        if item in pmd.dict_arttypes: win.setProperty('%s.%s' % (prefix, item), artwork[item])
-
-    # Lookup for fanarts/posters list
-    fanarts = artwork.get('fanarts', False)
-    posters = artwork.get('posters', False)
-    cf = 0
-    if fanarts:
-        for cf, fanart in enumerate(fanarts):
-            if cf > 5: break
-            win.setProperty('%s.fanart%s' % (prefix, str(cf + 1)), fanart)
-        cf += 1
-    if posters and cf < 2:
-        for count, fanart in enumerate(posters):
-            if count > 5: break
-            win.setProperty('%s.fanart%s' % (prefix, str(cf + count + 1)), fanart)
-
-    win.setProperty('%s.present' % prefix, 'true')
-
-
-def set_labels(prefix, data):
-    # set PVR related list items
-    for label in labels:
-        if data.get(label, False) and data[label]:
-            lvalue = str(data[label])
-            if isinstance(data[label], list): lvalue = ', '.join(data[label])
-            win.setProperty('%s.ListItem.%s' % (prefix, label), lvalue)
 
 
 def pvrartwork(current_item):
@@ -158,8 +111,8 @@ def pvrartwork(current_item):
             break
 
     # if no pvr related window there, clear properties and return
-    if not current_content:
-        if win.getProperty('PVR.Artwork.present') == 'true': clear_properties('PVR.Artwork')
+    if current_content is None:
+        if win.getProperty('PVR.Artwork.present') == 'true': pmd.clear_properties('PVR.Artwork')
         return current_item
 
     title = xbmc.getInfoLabel("ListItem.Title")
@@ -172,12 +125,12 @@ def pvrartwork(current_item):
 
     if current_item != '%s-%s' % (title, channel) or win.getProperty('PVR.Artwork.ManualLookup') == 'changed':
         win.setProperty("PVR.Artwork.ManualLookup", "busy")
-        clear_properties('PVR.Artwork')
+        pmd.clear_properties('PVR.Artwork')
 
         details = pmd.get_pvr_artwork(title, channel, genre, year, manual_select=False, ignore_cache=False)
         if details is not None:
             if details.get('art', False): set_properties('PVR.Artwork', details['art'])
-            set_labels('PVR.Artwork', details)
+            pmd.set_labels('PVR.Artwork', details)
 
     win.clearProperty("PVR.Artwork.ManualLookup")
     return '%s-%s' % (title, channel)

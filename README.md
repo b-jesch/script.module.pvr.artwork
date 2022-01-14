@@ -1,6 +1,6 @@
 ## PVR artwork module ##
 
-The addon offers several ways to generate content. Generated content is cached for 365 days. The search process is as follows:
+The addon offers several ways to generate content. Generated content is cached for 90, 180 or 360 days. The search process is as follows:
 
 - Previously cached content is read out. The title, year of release and media type (film/series) of a series or film serve as criteria.
 - the series/movies available in the databases are checked for hits with the title to be searched and the information (artwork, meta data) is provided.
@@ -89,7 +89,9 @@ try:
 except ImportError:
     xbmc.log('PVR artwork module not available', xbmc.LOGWARNING)
 
-content_types = dict({'MyPVRChannels.xml': 'channels', 'MyPVRGuide.xml': 'channels',
+# PVR artwork
+
+content_types = dict({'MyPVRChannels.xml': 'channels', 'MyPVRGuide.xml': 'tvguide', 'DialogPVRInfo.xml': 'info',
                       'MyPVRRecordings.xml': 'recordings', 'MyPVRTimers.xml': 'timers', 'MyPVRSearch.xml': 'search'})
 
 win = xbmcgui.Window(10000)
@@ -97,44 +99,42 @@ win = xbmcgui.Window(10000)
 
 def pvrartwork(current_item):
 
-    if xbmc.getCondVisibility('Container(%s).Scrolling') % xbmcgui.getCurrentWindowId() or \
-            win.getProperty('PVR.Artwork.ManualLookup') == 'busy':
-        xbmc.sleep(500)
-        return current_item
-
+    prefix = 'PVR.Artwork'
     current_content = None
 
-    # check if PVR related window is active
+    if xbmc.getCondVisibility('Container(%s).Scrolling') % xbmcgui.getCurrentWindowId() or \
+            win.getProperty('%s.Lookup' % prefix) == 'busy':
+        xbmc.sleep(500)
+        xbmc.log('Artwork module is busy or scrolling is active, return')
+        return current_item
+
+    # check if Live TV or PVR related window is active
+
     for pvr_content in content_types:
         if xbmc.getCondVisibility('Window.IsActive(%s)' % pvr_content):
             current_content = content_types.get(pvr_content, None)
             break
 
+    if current_content is None and xbmc.getCondVisibility('VideoPlayer.Content(LiveTV)'): current_content = 'livetv'
+
     # if no pvr related window there, clear properties and return
     if current_content is None:
-        if win.getProperty('PVR.Artwork.present') == 'true': pmd.clear_properties('PVR.Artwork')
-        return current_item
+        if win.getProperty('%s.present' % prefix) == 'true': pmd.clear_properties(prefix)
+        return ''
 
-    title = xbmc.getInfoLabel("ListItem.Title")
-    if not title:
-        title = xbmc.getInfoLabel("ListItem.Label")
+    label = 'VideoPlayer' if current_content == 'livetv' else 'ListItem'
+    title = xbmc.getInfoLabel('%s.Title' % label)
+    if label == 'ListItem' and not title: title = xbmc.getInfoLabel('%s.Label' % label)
+    channel = xbmc.getInfoLabel('%s.ChannelName' % label)
+    genre = xbmc.getInfoLabel('%s.Genre' % label)
+    year = xbmc.getInfoLabel('%s.Year' % label)
 
-    channel = xbmc.getInfoLabel('ListItem.ChannelName')
-    genre = xbmc.getInfoLabel('ListItem.Genre')
-    year = xbmc.getInfoLabel('ListItem.Year')
+    if not (title or channel): return ''
 
-    if current_item != '%s-%s' % (title, channel) or win.getProperty('PVR.Artwork.ManualLookup') == 'changed':
-        win.setProperty("PVR.Artwork.ManualLookup", "busy")
-        pmd.clear_properties('PVR.Artwork')
+    if current_item != '%s-%s' % (title, channel) and win.getProperty('%s.Lookup' % prefix) != 'busy':
+        pmd.get_pvr_artwork(prefix, title, channel, genre, year, manual_select=False, ignore_cache=False)
 
-        details = pmd.get_pvr_artwork(title, channel, genre, year, manual_select=False, ignore_cache=False)
-        if details is not None:
-            if details.get('art', False): set_properties('PVR.Artwork', details['art'])
-            pmd.set_labels('PVR.Artwork', details)
-
-    win.clearProperty("PVR.Artwork.ManualLookup")
     return '%s-%s' % (title, channel)
-
 
 if __name__ == '__main__':
 

@@ -34,12 +34,11 @@ def jsonrpc(query):
     return None
 
 
-def get_json(url, params=None):
+def get_json(url, params):
     """
         get info from a rest api
     """
-    if not params: params = dict()
-    else: log('Query TMDB with parameters', pretty_print=params)
+    log('Query TMDB %s with parameters' % url, pretty_print=params)
 
     try:
         response = requests.get(url, params=params, timeout=20)

@@ -29,7 +29,7 @@ msgstr "Suche nach Artwork/Metadaten nur für TV Aufnahmen"
 
 msgctxt "#32003"
 msgid "Enable TMDB online scraper"
-msgstr "Aktiviere TMDB Online Scraper"
+msgstr "TMDB Online Scraper aktivieren"
 
 msgctxt "#32004"
 msgid "Use '|' as delimiter to enter multiple values"
@@ -37,7 +37,7 @@ msgstr "Benutze '|' als Trennzeichen für mehrere Werte"
 
 msgctxt "#32005"
 msgid "Lookup for artwork in local databases/custom folders first"
-msgstr "Suche zuerst in lokalen Datenbanken/Ordnern nach Artwork"
+msgstr "Zuerst in lokalen Datenbanken/Ordnern nach Artwork suchen"
 
 msgctxt "#32006"
 msgid "Path to download folder"
@@ -87,11 +87,11 @@ msgstr "max. Anzahl Downloads (Poster, Fanart)"
 
 msgctxt "#32018"
 msgid "Enable online scraper"
-msgstr "Aktiviere Online Scraper"
+msgstr "Online Scraper aktivieren"
 
 msgctxt "#32019"
 msgid "Lookup artwork in a custom folder"
-msgstr "Suche nach Artwork im benutzerdefinierten Ordner"
+msgstr "Nach Artwork im benutzerdefinierten Ordner suchen"
 
 msgctxt "#32020"
 msgid "Path to custom folder"
@@ -129,23 +129,23 @@ msgstr "Aktualisieren - manuelle Suche"
 
 msgctxt "#32030"
 msgid "Remove channel from ignore list"
-msgstr "Entferne Kanal von Ausschlussliste"
+msgstr "Kanal von Ausschlussliste entfernen"
 
 msgctxt "#32031"
 msgid "Add channel to ignore list"
-msgstr "Füge Kanal zur Ausschlussliste hinzu"
+msgstr "Kanal zur Ausschlussliste hinzufügen"
 
 msgctxt "#32032"
 msgid "Remove title from ignore list"
-msgstr "Entferne Titel von Ausschlussliste"
+msgstr "Titel von Ausschlussliste entfernen"
 
 msgctxt "#32033"
 msgid "Add title to ignore list"
-msgstr "Füge Titel zur Ausschlussliste hinzu"
+msgstr "Titel zur Ausschlussliste hinzufügen"
 
 msgctxt "#32034"
 msgid "Configure module settings"
-msgstr "Konfiguriere Modul Einstellungen"
+msgstr "Modul Einstellungen konfigurieren"
 
 msgctxt "#32035"
 msgid "Settings for PVR artwork"
@@ -215,7 +215,7 @@ msgstr "Persönlicher TMDB API-Key"
 
 msgctxt "#32055"
 msgid "Store Items in Cache for"
-msgstr "Speichere Einträge im Cache für"
+msgstr "Speichern der Einträge im Cache für"
 
 msgctxt "#32056"
 msgid "90 Days"

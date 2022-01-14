@@ -86,7 +86,7 @@ class Tmdb(object):
             Search tmdb for a specific entry (can be movie or tvshow), parameters:
             title: (required) the title of the movie/tvshow to search for
         """
-        results = []
+        results = list()
         page = 1
         maxpages = 5
         while page < maxpages:
@@ -95,8 +95,7 @@ class Tmdb(object):
             page += 1
             if subresults:
                 for item in subresults:
-                    if item["media_type"] in ["movie", "tv"]:
-                        results.append(item)
+                    if item["media_type"] in ["movie", "tv"]: results.append(item)
             else:
                 break
         return results
@@ -171,7 +170,7 @@ class Tmdb(object):
 
         if self.api_key:
             # addon provided or personal api key
-            params["api_key"] = self.api_key
+            params.update({'api_key': self.api_key})
 
         return get_json(url, params)
 
@@ -179,7 +178,8 @@ class Tmdb(object):
         """helper method to map the details received from tmdb to kodi compatible formatting"""
         if not data:
             return {}
-        details = {"tmdb_id": data["id"], "rating": '%s (TMDB)' % data["vote_average"], "votes": data["vote_count"],
+        details = {"tmdb_id": data["id"],
+                   "ratings": {'tmdb': {'rating': data["vote_average"], 'votes': data["vote_count"]}},
                    "popularity": data["popularity"] * 1000, "popularity.tmdb": data["popularity"] * 1000,
                    "genre": [item["name"] for item in data["genres"]],
                    "country": [item['name'] for item in data["production_countries"]], "status": data["status"],

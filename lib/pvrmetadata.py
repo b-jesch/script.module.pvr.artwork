@@ -18,7 +18,7 @@ if ADDON.getSetting('pvr_art_custom_path') == '':
     log('set artwork costum path to %s' % PROFILE)
 
 labels = list(['director', 'writer', 'genre', 'country', 'studio', 'studiologo', 'premiered', 'mpaa', 'status',
-               'rating', 'castandrole', 'description'])
+               'rating', 'ratings', 'ratings.imdb', 'ratings.tmdb', 'ratings.themoviedb','castandrole', 'description'])
 
 win = xbmcgui.Window(10000)
 
@@ -184,6 +184,7 @@ class PVRMetaData(object):
                               'characterart': 'characterart.png', 'poster': 'poster.jpg', 'landscape': 'landscape.jpg'}
 
         self.dict_providers = {'imdb': 'IMDB', 'themoviedb': 'TMDB', 'tmdb': 'TMDB'}
+        self.prefix = 'PVR.Artwork'
 
         log('Initialized', type=xbmc.LOGINFO)
 
@@ -237,7 +238,8 @@ class PVRMetaData(object):
             details['art'].update({'posters': posters})
             details.update({'path': title_path})
 
-        if details.get('path', False): log('fetch artwork from %s' % title_path, type=xbmc.LOGINFO)
+        if ADDON.getSetting('log_results') == 'true' and details.get('path', False):
+            log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
         return details
 
     def lookup_local_library(self, title, media_type):
@@ -282,48 +284,35 @@ class PVRMetaData(object):
                                 'ratings': result['movies'][0]['ratings'], 'media_type': 'movie',  'is_db': True})
                 media_type = 'movie'
 
-        # unquote item values, create CastAndRole
-
+        # unquote and cleanup data, create CastAndRole
         if 'cast' in details:
-            for item in details['cast']:
-                if item.get('thumbnail', False): item.update({'thumbnail': url_unquote(item.get('thumbnail', ''))})
-
             details.update({'castandrole': create_castandrole(details['cast'])})
+            details.pop('cast')
 
-        if 'ratings' in details:
-            rating = list()
-            for item in self.dict_providers:
-                if details['ratings'].get(item, False):
-                    rating.append('%s (%s)' % (round(details['ratings'][item]['rating'], 1), self.dict_providers[item]))
-            if rating: details.update({'rating': rating})
+        # get studio logos graphics from studios depending on ressource images
+        if details.get('studio', False): details.update({'studiologo': get_studiologo(details['studio'])})
 
-            # get studio logos graphics from studios depending on ressource images
-
-            if details.get('studio', False): details.update({'studiologo': get_studiologo(details['studio'])})
-
-            # repack extra fanarts, extraposters into list objects and unquote item values
-
+        if 'art' in details:
+            # repack fanarts, posters, fanart, poster, banner, clearart into list/single objects and unquote item values
             fanarts = list()
             posters = list()
-            rm_items = list()
+            artworks = dict()
 
-            for [key, value] in details['art'].items():
-                details['art'][key] = url_unquote(value)
-                for e in range(1, 6):
-                    if key == 'fanart%s' % e:
-                        fanarts.append(details['art'][key])
-                        rm_items.append(key)
-                    if key == 'poster%s' % e:
-                        posters.append(details['art'][key])
-                        rm_items.append(key)
+            artwork_fanarts = ['fanart1', 'fanart2', 'fanart3', 'fanart4', 'fanart5']
+            artwork_posters = ['poster1', 'poster2', 'poster3', 'poster4', 'poster5']
+            artwork_others = ['poster', 'fanart', 'banner', 'clearlogo', 'clearart']
 
-            for item in rm_items: details['art'].pop(item)
+            for key in details['art'].keys():
+                if key in artwork_fanarts: fanarts.append(url_unquote(details['art'][key]))
+                if key in artwork_posters: posters.append(url_unquote(details['art'][key]))
+                if key in artwork_others: artworks.update({key: url_unquote(details['art'][key])})
 
-            details['art'].update({'fanarts': fanarts})
-            details['art'].update({'posters': posters})
+            details.pop('art')
+            details.update({'art': {'posters': posters, 'fanarts': fanarts}})
+            details['art'].update(extend_dict(details['art'], artworks))
 
         if details and ADDON.getSetting('log_results') == 'true':
-            log('fetch data for \'%s\' in %s database:' % (title, media_type), pretty_print=details)
+            log('fetched data for \'%s\' in %s database:' % (title, media_type), pretty_print=details)
         else:
             log('no results in local databases', type=xbmc.LOGINFO)
 
@@ -467,7 +456,8 @@ class PVRMetaData(object):
 
         return result
 
-    def get_pvr_artwork(self, title, channel="", genre="", year="", manual_select=False, ignore_cache=False):
+    def get_pvr_artwork(self, prefix, title, channel="", genre="", year="",
+                        manual_select=False, manual_set=False, ignore_cache=False):
         """
             collect full metadata and artwork for pvr entries (MAINFUNCTION)
             parameters: title (required)
@@ -479,7 +469,11 @@ class PVRMetaData(object):
         # try cache first
         # use cleantitle when searching cache
 
-        if not title: return
+        if not title: return False
+        if not prefix: prefix = self.prefix
+
+        win.setProperty("%s.Lookup" % prefix, "busy")
+        self.clear_properties(prefix)
 
         searchtitle = self.cleanup_title(title.lower())
         self.cache_str = "%s.%s" % (DB_PREFIX, searchtitle)
@@ -487,13 +481,14 @@ class PVRMetaData(object):
 
         if cache and not (manual_select or ignore_cache):
             log("fetch data from cache: %s" % self.cache_str, type=xbmc.LOGINFO)
-            details = cache
             if ADDON.getSetting('log_results') == 'true':
-                log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
-            return details
+                log('lookup for title: %s - final result:' % searchtitle, pretty_print=cache)
+            if manual_set: return cache
+            return self.set_art_and_labels(prefix, cache)
+
         else:
             # no cache - start our lookup adventure
-            log("no cache or manual select/ignore cache - start lookup: %s" % self.cache_str)
+            log("start lookup: %s" % self.cache_str)
 
             # workaround for recordings
             recording = self.lookup_local_recording(title)
@@ -523,8 +518,8 @@ class PVRMetaData(object):
                 # warn user about active skip filter
                 proceed = xbmcgui.Dialog().yesno(message=LOC(32027), heading=LOC(750))
             if excluded:
-                if not manual_select: return False
-                if not proceed: return False
+                if not manual_select: return self.reset_busy_state(prefix)
+                if not proceed: return self.reset_busy_state(prefix)
 
             # if manual lookup get the title from the user
             if manual_select:
@@ -532,7 +527,7 @@ class PVRMetaData(object):
                                                      type=xbmcgui.INPUT_ALPHANUM)
                 if not searchtitle:
                     log('manual selection aborted')
-                    return False
+                    return self.reset_busy_state(prefix)
 
             # if manual lookup and no mediatype, ask the user
             if manual_select and not details["media_type"]:
@@ -551,9 +546,10 @@ class PVRMetaData(object):
                 if ADDON.getSetting('log_results') == 'true':
                     log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
 
-                log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
+                log("cache data (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
                 self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
-                return details
+                if manual_select: return details
+                return self.set_art_and_labels(prefix, details)
 
             # lookup custom path
             details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
@@ -583,13 +579,16 @@ class PVRMetaData(object):
                 if thumb: details.update({'thumbnail': thumb})
 
                 # download artwork to custom folder
-                if ADDON.getSetting("pvr_art_download").lower() == "true":
+                if ADDON.getSetting("pvr_art_download").lower() == "true" \
+                        and not (details.get('path', False) or manual_select):
                     details.update({'path': self.get_custom_path(searchtitle, title)})
                     details["art"] = download_artwork(details['path'], details["art"], self.dict_arttypes)
 
             if details.get("runtime", False): details.update({'runtime': self.calc_duration(details["runtime"] / 60)})
             if details.get('released', False): details.update({'premiered': convert_date(details.get('released'))})
-            if details.get('cast', False): details.update({'castandrole': create_castandrole(details['cast'])})
+            if details.get('cast', False):
+                details.update({'castandrole': create_castandrole(details['cast'])})
+                details.pop('cast')
 
             if ADDON.getSetting('log_results') == 'true':
                 log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
@@ -600,12 +599,12 @@ class PVRMetaData(object):
         # always store result in cache
         log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
         self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
-        return details
+        return self.set_art_and_labels(prefix, details)
 
     # Main entry from context menu call
     # Do not remove
 
-    def pvr_artwork_options(self, title, channel, genre, year):
+    def pvr_artwork_options(self, prefix, title, channel, genre, year):
         """
             show options for pvr artwork
         """
@@ -642,16 +641,16 @@ class PVRMetaData(object):
             # FOR TESTING CACHE MECHANISM SET 'IGNORE_CACHE' TO FALSE !!!
             #
             log('Auto lookup for title: %s (%s), channel: %s, genre: %s' % (title, year, channel, genre))
-            self.get_pvr_artwork(title=title, channel=channel, genre=genre, year=year,
+            self.get_pvr_artwork(prefix, title=title, channel=channel, genre=genre, year=year,
                                  ignore_cache=True, manual_select=False)
         elif dialog == 1:
             # Refresh item (manual lookup)
             log('Manual lookup for title: %s (%s), channel: %s, genre: %s' % (title, year, channel, genre))
-            self.get_pvr_artwork(title=title, channel=channel, genre=genre, year=year,
+            self.get_pvr_artwork(prefix, title=title, channel=channel, genre=genre, year=year,
                                  ignore_cache=True, manual_select=True)
         elif dialog == 2:
             # Choose art
-            self.manual_set_pvr_artwork(title, channel, genre)
+            self.manual_set_pvr_artwork(prefix, title, channel, genre)
         elif dialog == 3:
             # Add/remove channel to ignore list
             if channel in ignorechannels:
@@ -678,10 +677,10 @@ class PVRMetaData(object):
             # Open addon settings
             xbmc.executebuiltin("Addon.OpenSettings(%s)" % ADDON_ID)
 
-    def manual_set_pvr_artwork(self, title, channel, genre):
+    def manual_set_pvr_artwork(self, prefix, title, channel, genre):
         """manual override artwork options"""
 
-        details = self.get_pvr_artwork(title=title, channel=channel, genre=genre)
+        details = self.get_pvr_artwork(prefix, title=title, channel=channel, genre=genre, manual_set=True)
 
         # show dialogselect with all artwork option
         changemade, artwork = manual_set_artwork(details["art"], self.dict_arttypes)
@@ -690,7 +689,7 @@ class PVRMetaData(object):
             # save results in cache
             log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
             self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
-        return details
+        return self.set_art_and_labels(prefix, details)
 
     def clear_properties(self, prefix):
 
@@ -723,12 +722,38 @@ class PVRMetaData(object):
                 if count > 5: break
                 win.setProperty('%s.fanart%s' % (prefix, str(cf + count + 1)), fanart)
 
-        win.setProperty('%s.present' % prefix, 'true')
-
     def set_labels(self, prefix, data):
         # set PVR related list items
         for label in labels:
-            if data.get(label, False) and data[label]:
+
+            # handle special part 'ratings'
+            if label == 'ratings' and data.get(label, False):
+                allratings = list()
+                for key in self.dict_providers:
+                    if data[label].get(key, False):
+                        (lprop, lval) = '%s.ListItem.%s.%s' % (prefix, label, key), \
+                                        str(round(data[label][key].get('rating', 0), 1))
+                        win.setProperty(lprop, lval)
+                        allratings.append('%s (%s)' % (round(data[label][key].get('rating', 0), 1),
+                                                       self.dict_providers[key]))
+                win.setProperty('%s.ListItem.rating' % prefix, ', '.join(allratings))
+
+            elif data.get(label, False) and data[label]:
                 lvalue = str(data[label])
                 if isinstance(data[label], list): lvalue = ', '.join(data[label])
-                win.setProperty('%s.ListItem.%s' % (prefix, label), lvalue)
+                (lprop, lval) = '%s.ListItem.%s' % (prefix, label), lvalue
+                win.setProperty(lprop, lval)
+
+    def set_art_and_labels(self, prefix, details):
+
+        if details.get('art', False):
+            self.set_properties(prefix, details['art'])
+            win.setProperty('%s.present' % prefix, 'true')
+
+        self.set_labels(prefix, details)
+        win.clearProperty("%s.Lookup" % prefix)
+        return True
+
+    def reset_busy_state(self, prefix):
+        win.clearProperty("%s.Lookup" % prefix)
+        return False

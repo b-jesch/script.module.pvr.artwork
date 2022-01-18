@@ -144,8 +144,8 @@ msgid "Add title to ignore list"
 msgstr "Titel zur Ausschlussliste hinzufügen"
 
 msgctxt "#32034"
-msgid "Configure module settings"
-msgstr "Modul Einstellungen konfigurieren"
+msgid "Module settings"
+msgstr "Modul Einstellungen"
 
 msgctxt "#32035"
 msgid "Settings for PVR artwork"
@@ -193,17 +193,32 @@ msgstr "Abgesetzt"
 
 msgctxt "#32046"
 msgid "Remove genre from ignore list"
-msgstr "Entferne Genre von Ausschlussliste"
+msgstr "Genre von Ausschlussliste entfernen"
 
 msgctxt "#32047"
 msgid "Add genre to ignore list"
-msgstr "Füge Genre zur Ausschlussliste hinzu"
+msgstr "Genre zur Ausschlussliste hinzufügen"
 
-# empty strings 32048 - 32051
+msgctxt "#32048"
+msgid "Maintenance"
+msgstr "Wartung"
+
+msgctxt "#32049"
+msgid "Delete Artwork Module Entries from Cache"
+msgstr "Einträge aus dem Cache entfernen"
+
+msgctxt "#32050"
+msgid "Delete local Artwork"
+msgstr "lokal gespeicherte Artwork entfernen"
+
+msgctxt "#32051"
+msgid "Entries of PVR Artwork Module removed"
+msgstr "Einträge des PVR Artwork Modules entfernt"
+
 
 msgctxt "#32052"
-msgid "TMDB API Key"
-msgstr "TMDB API Key"
+msgid "API Key / Maintenance"
+msgstr "API Key / Wartung"
 
 msgctxt "#32053"
 msgid "Unlock TMDB by providing a custom API key"
@@ -229,6 +244,10 @@ msgctxt "#32058"
 msgid "360 Days"
 msgstr "360 Tage"
 
+msgctxt "#32059"
+msgid "This will remove all downloaded Artwork from '%s' Folder! Do you want to continue?"
+msgstr "Es werden alle heruntergeladene Artwork aus dem Ordner '%s' gelöscht! Möchtest Du fortfahren?"
+
 msgctxt "#32060"
 msgid "1"
 msgstr "1"
@@ -248,6 +267,10 @@ msgstr "4"
 msgctxt "#32064"
 msgid "5"
 msgstr ""
+
+msgctxt "#32070"
+msgid "%s Folders deleted"
+msgstr "%s Verzeichnisse gelöscht"
 
 msgctxt "#32102"
 msgid "Search for Artwork and/or Metadata only for TV recordings."
@@ -304,6 +327,14 @@ msgstr "Ignoriere vordefinierte Genres wie Nachrichten, Wetter, Werbung, Shoppin
 msgctxt "#32144"
 msgid "Log search results in debug log using formatted output. May significant increase the size of the log."
 msgstr "Logge Suchergebnisse formatiert im Debug Log. Kann die Größe des Logfiles signifikant erhöhen."
+
+msgctxt "#32149"
+msgid "Remove all entries of PVR Artwork Module with the current Module Index from SimpleCache Database."
+msgstr "Entfernt all Einträge des PVR Artwork Modules mit dem aktuellen Modul Index aus der SimpleCache Datenbank."
+
+msgctxt "#32150"
+msgid "Remove all Artwork Folders from local Download Directory of PVR Artwork Module."
+msgstr "Entfernt alle Artwork Ordner aus dem Download Verzeichnis des PVR Artwork Modules."
 
 msgctxt "#32153"
 msgid "Your personal API key. If you don't own a key, request one on the website of the TMDB (www.tmdb.org). Without a personal key a search using the TMDB option is not possible."

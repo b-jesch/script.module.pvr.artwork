@@ -13,9 +13,10 @@ from tmdb import Tmdb
 
 from datetime import timedelta
 
-if ADDON.getSetting('pvr_art_custom_path') == '':
-    ADDON.setSetting('pvr_art_custom_path', PROFILE)
-    log('set artwork costum path to %s' % PROFILE)
+if ADDON.getSetting('pvr_art_custom_path') == '' or ADDON.getSetting('pvr_art_custom_path') == PROFILE:
+    ADDON.setSetting('pvr_art_custom_path', os.path.join(PROFILE, 'artwork'))
+    xbmcvfs.mkdirs(os.path.join(PROFILE, 'artwork'))
+    log('set artwork costum path to %s' % os.path.join(PROFILE, 'artwork'))
 
 labels = list(['director', 'writer', 'genre', 'country', 'studio', 'studiologo', 'premiered', 'mpaa', 'status',
                'rating', 'ratings', 'ratings.imdb', 'ratings.tmdb', 'ratings.themoviedb','castandrole', 'description'])
@@ -180,8 +181,9 @@ class PVRMetaData(object):
         self.cache_str = ''
         self.tmdb = Tmdb()
         self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart,jpg',
-                              'banner': 'banner.jpg', 'clearlogo': 'clearlogo.png', 'clearart': 'clearart.png',
-                              'characterart': 'characterart.png', 'poster': 'poster.jpg', 'landscape': 'landscape.jpg'}
+                              'banner': 'banner.jpg', 'logo': 'logo.png', 'clearlogo': 'clearlogo.png',
+                              'clearart': 'clearart.png', 'characterart': 'characterart.png', 'poster': 'poster.jpg',
+                              'landscape': 'landscape.jpg'}
 
         self.dict_providers = {'imdb': 'IMDB', 'themoviedb': 'TMDB', 'tmdb': 'TMDB'}
         self.prefix = 'PVR.Artwork'
@@ -236,10 +238,8 @@ class PVRMetaData(object):
                 if ('poster%s.jpg' % n) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % n))
             details['art'].update({'fanarts': fanarts})
             details['art'].update({'posters': posters})
-            details.update({'path': title_path})
 
-        if ADDON.getSetting('log_results') == 'true' and details.get('path', False):
-            log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
+        details.update({'path': title_path})
         return details
 
     def lookup_local_library(self, title, media_type):
@@ -300,7 +300,7 @@ class PVRMetaData(object):
 
             artwork_fanarts = ['fanart1', 'fanart2', 'fanart3', 'fanart4', 'fanart5']
             artwork_posters = ['poster1', 'poster2', 'poster3', 'poster4', 'poster5']
-            artwork_others = ['poster', 'fanart', 'banner', 'clearlogo', 'clearart']
+            artwork_others = ['poster', 'fanart', 'banner', 'clearlogo', 'clearart', 'logo']
 
             for key in details['art'].keys():
                 if key in artwork_fanarts: fanarts.append(url_unquote(details['art'][key]))
@@ -555,14 +555,15 @@ class PVRMetaData(object):
             details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
 
             # do TMDB scraping if enabled and no arts in previous lookups
-            if ADDON.getSetting("use_tmdb").lower() == "true" and ADDON.getSetting('tmdb_apikey') and \
-                    ((details['art'] and ignore_cache) or not details['art']):
+            if ADDON.getSetting("use_tmdb").lower() == "true" and ADDON.getSetting('tmdb_apikey'):
 
                 log("scraping metadata from TMDB for title: %s (media type: %s)" %
                     (searchtitle, details["media_type"]), type=xbmc.LOGINFO)
                 tmdb_result = self.get_tmdb_details(title=searchtitle, preftype=details["media_type"], year=year,
                                                     manual_select=manual_select)
                 if tmdb_result:
+                    # Discard online art form tmdb if local art is present and not manual select
+                    if details.get('art', False) and not manual_select: tmdb_result.pop('art')
                     details = extend_dict(details, tmdb_result)
                     details["media_type"] = tmdb_result["media_type"]
                 elif ignore_cache:
@@ -579,10 +580,8 @@ class PVRMetaData(object):
                 if thumb: details.update({'thumbnail': thumb})
 
                 # download artwork to custom folder
-                if ADDON.getSetting("pvr_art_download").lower() == "true" \
-                        and not (details.get('path', False) or manual_select):
-                    details.update({'path': self.get_custom_path(searchtitle, title)})
-                    details["art"] = download_artwork(details['path'], details["art"], self.dict_arttypes)
+                if ADDON.getSetting("pvr_art_download").lower() == "true":
+                    details.update({'art': download_artwork(details['path'], details["art"], self.dict_arttypes)})
 
             if details.get("runtime", False): details.update({'runtime': self.calc_duration(details["runtime"] / 60)})
             if details.get('released', False): details.update({'premiered': convert_date(details.get('released'))})

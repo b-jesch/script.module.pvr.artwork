@@ -144,7 +144,7 @@ msgid "Add title to ignore list"
 msgstr ""
 
 msgctxt "#32034"
-msgid "Configure module settings"
+msgid "Module settings"
 msgstr ""
 
 msgctxt "#32035"
@@ -199,10 +199,24 @@ msgctxt "#32047"
 msgid "Add genre to ignore list"
 msgstr ""
 
-# empty strings 32048 - 32051
+msgctxt "#32048"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#32049"
+msgid "Delete Artwork Module Entries from Cache"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Delete local Artwork"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Entries of PVR Artwork Module removed"
+msgstr ""
 
 msgctxt "#32052"
-msgid "TMDB API Key"
+msgid "API Key / Maintenance"
 msgstr ""
 
 msgctxt "#32053"
@@ -229,7 +243,9 @@ msgctxt "#32058"
 msgid "360 Days"
 msgstr ""
 
-# empty strings 32059
+msgctxt "#32059"
+msgid "This will remove all downloaded Artwork from '%s' Folder! Do you want to continue?"
+msgstr ""
 
 msgctxt "#32060"
 msgid "1"
@@ -249,6 +265,10 @@ msgstr ""
 
 msgctxt "#32064"
 msgid "5"
+msgstr ""
+
+msgctxt "#32070"
+msgid "%s Folders deleted"
 msgstr ""
 
 msgctxt "#32102"
@@ -305,6 +325,14 @@ msgstr ""
 
 msgctxt "#32144"
 msgid "Log search results in debug log using formatted output. May significant increase the size of the log."
+msgstr ""
+
+msgctxt "#32149"
+msgid "Remove all entries of PVR Artwork Module with the current Module Index from SimpleCache Database."
+msgstr ""
+
+msgctxt "#32150"
+msgid "Remove all Artwork Folders from local Download Directory of PVR Artwork Module."
 msgstr ""
 
 msgctxt "#32153"

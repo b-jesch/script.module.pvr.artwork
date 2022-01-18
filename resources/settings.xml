@@ -153,7 +153,7 @@
 				</setting>
 			</group>
 		</category>
-		<category id="tmdb api key" label="32052" help="">
+		<category id="tmdb_api_key" label="32052" help="">
 			<group id="1" label="32053">
 				<setting id="tmdb_apikey" type="string" label="32054" help="32153">
 					<level>0</level>
@@ -163,6 +163,24 @@
 					</constraints>
 					<control type="edit" format="string">
 						<heading>32054</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="2" label="32048">
+				<setting id="del_simplecache" type="action" label="32049" help="32149">
+					<level>0</level>
+					<default/>
+					<control format="action" type="button">
+						<data>RunScript(script.module.pvr.artwork,clear_db)</data>
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="del_local_artwork" type="action" label="32050" help="32150">
+					<level>0</level>
+					<default/>
+					<control format="action" type="button">
+						<data>RunScript(script.module.pvr.artwork,clear_local_artwork)</data>
+						<close>true</close>
 					</control>
 				</setting>
 			</group>

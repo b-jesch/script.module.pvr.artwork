@@ -117,7 +117,7 @@ class Tmdb(object):
             get all moviedetails
         """
         params = {
-            "append_to_response": "keywords,videos,credits,images",
+            "append_to_response": "credits,images",
             "include_image_language": "%s,en" % LANGUAGE,
             "language": LANGUAGE
         }
@@ -126,7 +126,9 @@ class Tmdb(object):
         return self.map_details(data, "movie")
 
     def get_movieset_details(self, movieset_id):
-        """get all moviesetdetails"""
+        """
+            get all moviesetdetails
+        """
         details = {"art": {}}
         params = {"language": LANGUAGE}
         result = self.get_data("collection/%s" % movieset_id, params)

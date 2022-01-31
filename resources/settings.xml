@@ -145,13 +145,6 @@
 					</control>
 				</setting>
 			</group>
-			<group id="3">
-				<setting id="log_results" type="boolean" label="32044" help="32144">
-					<level>0</level>
-					<default>false</default>
-					<control type="toggle"/>
-				</setting>
-			</group>
 		</category>
 		<category id="tmdb_api_key" label="32052" help="">
 			<group id="1" label="32053">
@@ -167,8 +160,13 @@
 				</setting>
 			</group>
 			<group id="2" label="32048">
+				<setting id="log_results" type="boolean" label="32044" help="32144">
+					<level>1</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="del_simplecache" type="action" label="32049" help="32149">
-					<level>0</level>
+					<level>1</level>
 					<default/>
 					<control format="action" type="button">
 						<data>RunScript(script.module.pvr.artwork,clear_db)</data>

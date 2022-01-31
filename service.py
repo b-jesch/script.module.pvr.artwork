@@ -39,6 +39,23 @@ if len(sys.argv) > 1:
         if yesno:
             count = rmdirs(artwork, 0, force=True)
             xbmcgui.Dialog().notification(LOC(32001), LOC(32070) % count, xbmcgui.NOTIFICATION_INFO)
+    elif sys.argv[1] == 'call_contextmenu':
+        try:
+            from lib.pvrmetadata import PVRMetaData
+        except ImportError:
+            sys.exit()
+
+        title = xbmc.getInfoLabel("ListItem.Title")
+        if not title:
+            title = xbmc.getInfoLabel("ListItem.Label")
+
+        channel = xbmc.getInfoLabel("ListItem.ChannelName")
+        genre = xbmc.getInfoLabel("ListItem.Genre")
+        year = xbmc.getInfoLabel("ListItem.Year")
+
+        pmd = PVRMetaData()
+        pmd.pvr_artwork_options('PVR.Artwork', title, channel, genre, year)
+
     else:
         xbmc.log('unknown command parameter: %s' % sys.argv[1], xbmc.LOGWARNING)
 else:

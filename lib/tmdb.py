@@ -2,7 +2,7 @@ import xbmcgui
 import simplecache
 from operator import itemgetter
 from difflib import SequenceMatcher as SM
-from tools import *
+from .tools import *
 
 
 class Tmdb(object):

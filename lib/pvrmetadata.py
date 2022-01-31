@@ -8,8 +8,8 @@ import os
 from difflib import SequenceMatcher as SM
 import simplecache
 
-from tools import *
-from tmdb import Tmdb
+from .tools import *
+from .tmdb import Tmdb
 
 from datetime import timedelta
 
@@ -180,7 +180,7 @@ class PVRMetaData(object):
         self.cache = simplecache.SimpleCache()
         self.cache_str = ''
         self.tmdb = Tmdb()
-        self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart,jpg',
+        self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart.jpg',
                               'banner': 'banner.jpg', 'logo': 'logo.png', 'clearlogo': 'clearlogo.png',
                               'clearart': 'clearart.png', 'characterart': 'characterart.png', 'poster': 'poster.jpg',
                               'landscape': 'landscape.jpg'}

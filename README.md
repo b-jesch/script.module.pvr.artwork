@@ -35,3 +35,7 @@ Artwork depends on the presence of artwork files in file system (cache), databas
 additional Artwork: 
 
 `PVR.Artwork.thumb` (folder.jpg), `PVR.Artwork.discart` (discart.jpg), `PVR.Artwork.banner` (banner.jpg), `PVR.Artwork.logo` (logo.png), `PVR.Artwork.clearlogo` (clearlogo.png), `PVR.Artwork.clearart` (clearart.png), `PVR.Artwork.characterart` (characterart.png), `PVR.Artwork.landscape` (landscape.jpg)
+
+### Others ###
+
+The PVR Artwork Module has a label `PVR.Artwork.Lookup`. If this label contains the value `busy` the module is processing a PVR item at this moment. This can be used to show a "Busy"-Spinner or something else to signaling a work in progress.

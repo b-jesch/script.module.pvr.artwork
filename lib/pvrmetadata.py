@@ -325,18 +325,17 @@ class PVRMetaData(object):
         """
         title_path = ""
         custom_path = ADDON.getSetting("pvr_art_custom_path")
-        if ADDON.getSetting("pvr_art_custom") == "true":
-            dirs = xbmcvfs.listdir(custom_path)[0]
+        dirs = xbmcvfs.listdir(custom_path)[0]
 
-            for strictness in [1, 0.95, 0.9, 0.8]:
-                for directory in dirs:
-                    curpath = os.path.join(custom_path, directory)
-                    for item in [title, searchtitle]:
-                        match = SM(None, item, directory).ratio()
-                        if match >= strictness: return curpath
+        for strictness in [1, 0.95, 0.9, 0.8]:
+            for directory in dirs:
+                curpath = os.path.join(custom_path, directory)
+                for item in [title, searchtitle]:
+                    match = SM(None, item, directory).ratio()
+                    if match >= strictness: return curpath
 
-            if not title_path and ADDON.getSetting("pvr_art_download").lower() == "true":
-                title_path = os.path.join(custom_path, normalize_string(title))
+        if not title_path and ADDON.getSetting("pvr_art_download").lower() == "true":
+            title_path = os.path.join(custom_path, normalize_string(title))
         return title_path
 
     @staticmethod
@@ -540,19 +539,22 @@ class PVRMetaData(object):
             if recording and recording.get("thumbnail"): details["art"]["thumb"] = recording["thumbnail"]
 
             # lookup movie/tv library
-            details = extend_dict(details, self.lookup_local_library(searchtitle, details["media_type"]))
-            if details.get('is_db', False):
+            if ADDON.getSetting('pvr_art_custom') == 'true':
+                details = extend_dict(details, self.lookup_local_library(searchtitle, details["media_type"]))
+                if details.get('is_db', False):
 
-                if ADDON.getSetting('log_results') == 'true':
-                    log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
+                    if ADDON.getSetting('log_results') == 'true':
+                        log('lookup for title: %s - final result:' % searchtitle, pretty_print=details)
 
-                log("cache data (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
-                self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
-                if manual_select: return details
-                return self.set_art_and_labels(prefix, details)
+                    log("cache data (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
+                    self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
+                    # if manual_select: return details
+                    return self.set_art_and_labels(prefix, details)
 
-            # lookup custom path
-            details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
+                # lookup custom path
+                details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
+            else:
+                details.update({'path': self.get_custom_path(searchtitle, title)})
 
             # do TMDB scraping if enabled and no arts in previous lookups
             if ADDON.getSetting("use_tmdb").lower() == "true" and ADDON.getSetting('tmdb_apikey'):

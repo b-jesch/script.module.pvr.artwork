@@ -281,8 +281,8 @@ msgid "Search online using the TMDB. This requires a valid TMDB API key otherwis
 msgstr "Online-Suche über die TMDB. Dazu ist ein gültiger TMDB-API-Schlüssel erforderlich, andernfalls wird die Online-Suche übersprungen."
 
 msgctxt "#32104"
-msgid "Split titles on this char(s). Note that only the first part of the title will be used for searching. Separate multiple spilt chars with pipe '|'"
-msgstr "Abtrennen des Titels an diese(m) Zeichen. Es wird nur der vordere Teil des Titels für die Suche benutzt. Trenne mehrere Zeichen mit der Pipe '|'"
+msgid "Split titles on this char(s) starts from right. Note that only the first part of the title will be used for searching. Separate multiple spilt chars with pipe '|'"
+msgstr "Abtrennen des Titels an diese(m) Zeichen beginnend von hinten. Es wird nur der vordere Teil des Titels für die Suche benutzt. Trenne mehrere Zeichen mit der Pipe '|'"
 
 msgctxt "#32105"
 msgid "Search at first in local movie and tv show databases and local folders. Previous downloaded files in the download folder are included."

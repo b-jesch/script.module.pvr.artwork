@@ -280,7 +280,7 @@ msgid "Search online using the TMDB. This requires a valid TMDB API key otherwis
 msgstr ""
 
 msgctxt "#32104"
-msgid "Split titles on this char(s). Note that only the first part of the title will be used for searching. Separate multiple spilt chars with pipe '|'"
+msgid "Split titles on this char(s) starts from right. Note that only the first part of the title will be used for searching. Separate multiple spilt chars with pipe '|'"
 msgstr ""
 
 msgctxt "#32105"

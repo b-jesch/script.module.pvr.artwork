@@ -343,11 +343,14 @@ class PVRMetaData(object):
         """
             common logic to get a proper searchtitle from crappy titles provided by pvr
         """
-        # split characters - split on common splitters
+        # split characters - split on common splitters beginning from right
         splitters = ADDON.getSetting("pvr_art_splittitlechar").split("|")
 
         for splitchar in splitters:
-            title = title.split(splitchar)[0]
+            if len(title.split(splitchar)) > 1:
+                title = splitchar.join(title.split(splitchar)[:-1])
+            else:
+                title = title.split(splitchar)[0]
 
         # replace common chars and words and return title
         return re.sub(ADDON.getSetting("pvr_art_replace_by_space"), ' ', title).strip()

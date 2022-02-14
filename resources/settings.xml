@@ -16,6 +16,27 @@
 				<setting id="use_tmdb" type="boolean" label="32003" help="32103">
 					<level>0</level>
 					<default>false</default>
+					<dependencies>
+						<dependency type="enable" operator="!is" setting="tmdb_apikey"></dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="use_fanart_tv" type="boolean" label="32017" help="32117">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="enable" operator="!is" setting="tmdb_apikey"></dependency>
+						<dependency type="enable" operator="!is" setting="fanart_apikey"></dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="prefer_fanart_tv" type="boolean" label="32024" help="">
+					<level>0</level>
+					<default>false</default>
+					<dependencies>
+						<dependency type="enable" operator="!is" setting="tmdb_apikey"></dependency>
+						<dependency type="enable" operator="!is" setting="fanart_apikey"></dependency>
+					</dependencies>
 					<control type="toggle"/>
 				</setting>
 				<setting id="pvr_art_download" type="boolean" label="32007" help="32107">
@@ -23,7 +44,10 @@
 					<default>true</default>
 					<dependencies>
 						<dependency type="enable">
-							<condition operator="is" setting="use_tmdb">true</condition>
+							<and>
+								<condition operator="!is" setting="tmdb_apikey"></condition>
+								<condition operator="is" setting="use_tmdb">true</condition>
+							</and>
 						</dependency>
 					</dependencies>
 					<control type="toggle"/>
@@ -41,6 +65,7 @@
 					<dependencies>
 						<dependency type="enable">
 							<and>
+								<condition operator="!is" setting="tmdb_apikey"></condition>
 								<condition operator="is" setting="use_tmdb">true</condition>
 								<condition operator="is" setting="pvr_art_download">true</condition>
 							</and>
@@ -65,6 +90,7 @@
 					<dependencies>
 						<dependency type="enable">
 							<and>
+								<condition operator="!is" setting="tmdb_apikey"></condition>
 								<condition operator="is" setting="use_tmdb">true</condition>
 								<condition operator="is" setting="pvr_art_download">true</condition>
 							</and>
@@ -87,7 +113,7 @@
 				</setting>
 			</group>
 		</category>
-		<category id="feineinstellungen" label="32008" help="">
+		<category id="detail_settings" label="32008" help="">
 			<group id="1" label="32009">
 				<setting id="pvr_art_ignore_channels" type="string" label="32010" help="32110">
 					<level>0</level>
@@ -156,6 +182,16 @@
 					</constraints>
 					<control type="edit" format="string">
 						<heading>32054</heading>
+					</control>
+				</setting>
+				<setting id="fanart_apikey" type="string" label="32023" help="32123">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string">
+						<heading>32023</heading>
 					</control>
 				</setting>
 			</group>

@@ -1,5 +1,4 @@
 import xbmcgui
-import simplecache
 from operator import itemgetter
 from difflib import SequenceMatcher as SM
 from .tools import *
@@ -10,7 +9,6 @@ class Tmdb(object):
 
     def __init__(self):
         self.api_key = ADDON.getSetting('tmdb_apikey')
-        self.cache = simplecache.SimpleCache()
 
     def search_movie(self, title, year="", manual_select=False):
         """
@@ -31,7 +29,7 @@ class Tmdb(object):
         """
         details = {}
         params = {"query": title, "language": LANGUAGE}
-        result = self.get_data("search/collection", params)
+        result = self.get_tmdb_data("search/collection", params)
         if result:
             set_id = result[0]["id"]
             details = self.get_movieset_details(set_id)
@@ -47,7 +45,7 @@ class Tmdb(object):
         params = {"query": title, "language": LANGUAGE}
         if year:
             params["year"] = parse_int(year)
-        return self.get_data("search/movie", params)
+        return self.get_tmdb_data("search/movie", params)
 
     def search_tvshow(self, title, year="", manual_select=False):
         """
@@ -91,7 +89,7 @@ class Tmdb(object):
         maxpages = 5
         while page < maxpages:
             params = {"query": title, "language": LANGUAGE, "page": page}
-            subresults = self.get_data("search/multi", params)
+            subresults = self.get_tmdb_data("search/multi", params)
             page += 1
             if subresults:
                 for item in subresults:
@@ -110,19 +108,19 @@ class Tmdb(object):
         params = {"query": title, "language": LANGUAGE}
         if year:
             params["first_air_date_year"] = parse_int(year)
-        return self.get_data("search/tv", params)
+        return self.get_tmdb_data("search/tv", params)
 
     def get_movie_details(self, movie_id):
         """
             get all moviedetails
         """
         params = {
-            "append_to_response": "credits,images",
+            "append_to_response": "external_ids,credits,images",
             "include_image_language": "%s,en" % LANGUAGE,
             "language": LANGUAGE
         }
         log('Get movie details')
-        data = self.get_data("movie/%s" % movie_id, params)
+        data = self.get_tmdb_data("movie/%s" % movie_id, params)
         return self.map_details(data, "movie")
 
     def get_movieset_details(self, movieset_id):
@@ -131,7 +129,7 @@ class Tmdb(object):
         """
         details = {"art": {}}
         params = {"language": LANGUAGE}
-        result = self.get_data("collection/%s" % movieset_id, params)
+        result = self.get_tmdb_data("collection/%s" % movieset_id, params)
         if result:
             details.update({'title': result['name'], 'plot': result['overview'], 'tmdb_id': result['id'],
                            'art': {'poster': 'https://image.tmdb.org/t/p/original%s' % result['poster_path'],
@@ -144,12 +142,12 @@ class Tmdb(object):
             get all tvshowdetails
         """
         params = {
-            "append_to_response": "keywords,videos,external_ids,credits,images",
+            "append_to_response": "external_ids,credits,images",
             "include_image_language": "%s,en" % LANGUAGE,
             "language": LANGUAGE
         }
         log('Get tvshow details of id %s' % tvshow_id)
-        data = self.get_data('tv/%s' % tvshow_id, params)
+        data = self.get_tmdb_data('tv/%s' % tvshow_id, params)
         return self.map_details(data, "tvshow")
 
     def get_videodetails_by_externalid(self, extid, extid_type):
@@ -157,14 +155,14 @@ class Tmdb(object):
             get metadata by external ID (like imdbid)
         """
         params = {"external_source": extid_type, "language": LANGUAGE}
-        results = self.get_data("find/%s" % extid, params)
+        results = self.get_tmdb_data("find/%s" % extid, params)
         if results and results["movie_results"]:
             return self.get_movie_details(results["movie_results"][0]["id"])
         elif results and results["tv_results"]:
             return self.get_tvshow_details(results["tv_results"][0]["id"])
         return {}
 
-    def get_data(self, endpoint, params):
+    def get_tmdb_data(self, endpoint, params):
         """
             helper method to get data from tmdb json API
         """
@@ -174,7 +172,7 @@ class Tmdb(object):
             # addon provided or personal api key
             params.update({'api_key': self.api_key})
 
-        return get_json(url, params)
+        return get_json(url, params, prefix='results')
 
     def map_details(self, data, media_type):
         """helper method to map the details received from tmdb to kodi compatible formatting"""

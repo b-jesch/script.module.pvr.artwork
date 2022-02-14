@@ -83,7 +83,9 @@ msgctxt "#32016"
 msgid "max. count of downloads (poster, fanart)"
 msgstr ""
 
-# empty string 32017
+msgctxt "#32017"
+msgid "Get additional Fanart from fanart.tv"
+msgstr ""
 
 msgctxt "#32018"
 msgid "Enable online scraper"
@@ -105,7 +107,13 @@ msgctxt "#32022"
 msgid "Define Content"
 msgstr ""
 
-# empty strings 32023 - 32024
+msgctxt "#32023"
+msgid "Fanart.tv API Key"
+msgstr ""
+
+msgctxt "#32024"
+msgid "Prefer Fanart from fanart.tv"
+msgstr ""
 
 msgctxt "#32025"
 msgid "Ignore Genres"
@@ -216,15 +224,15 @@ msgid "Entries of PVR Artwork Module removed"
 msgstr ""
 
 msgctxt "#32052"
-msgid "API Key / Maintenance"
+msgid "API Keys / Maintenance"
 msgstr ""
 
 msgctxt "#32053"
-msgid "Unlock TMDB by providing a custom API key"
+msgid "Necessary API Keys"
 msgstr ""
 
 msgctxt "#32054"
-msgid "Personal API-Key for TMDB"
+msgid "TMDB API Key"
 msgstr ""
 
 msgctxt "#32055"
@@ -319,6 +327,14 @@ msgctxt "#32125"
 msgid "Define special genres to ignored here (sports, news, game shows etc.). Comma separated."
 msgstr ""
 
+msgctxt "#32117"
+msgid "Get additional Fanart using fanart.tv. This requires a valid API key from fanart.tv otherwise the online search will be skipped."
+msgstr ""
+
+msgctxt "#32123"
+msgid "Your personal API key. If you don't own a key, request one on the website of fanart.tv. Without a personal key it's not possible to download additional artwork from fanart.tv."
+msgstr ""
+
 msgctxt "#32126"
 msgid "Ignore common genres like news, weather, sports, advertisement, shopping etc. This needs a correct tagged EPG from your EPG provider."
 msgstr ""
@@ -335,7 +351,7 @@ msgctxt "#32150"
 msgid "Remove all Artwork Folders from local Download Directory of PVR Artwork Module."
 msgstr ""
 
-msgctxt "#32153"
+msgctxt "#32154"
 msgid "Your personal API key. If you don't own a key, request one on the website of the TMDB (www.tmdb.org). Without a personal key a search using the TMDB option is not possible."
 msgstr ""
 

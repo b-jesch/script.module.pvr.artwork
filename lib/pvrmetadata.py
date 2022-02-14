@@ -10,6 +10,7 @@ import simplecache
 
 from .tools import *
 from .tmdb import Tmdb
+from .fanart_tv import FanartTv
 
 from datetime import timedelta
 
@@ -584,12 +585,28 @@ class PVRMetaData(object):
 
                 if thumb: details.update({'thumbnail': thumb})
 
+                # get additional fanart from fanart.tv if enabled
+                if ADDON.getSetting("use_fanart_tv").lower() == "true" and ADDON.getSetting('fanart_apikey'):
+
+                    FTv = FanartTv()
+                    additional_fanart = FTv.get_fanarts(details.get('media_type', None), details.get('tmdb_id', None))
+
+                    if additional_fanart:
+                        for key in additional_fanart.keys():
+                            if not details['art'].get(key, False): details['art'].update({key: additional_fanart[key]})
+                            elif ADDON.getSetting('prefer_fanart_tv').lower() == 'true':
+                                details['art'].update({key: additional_fanart[key]})
+                                log('overwrite TMDB %s with item from fanart.tv due settings' % key)
+                            else:
+                                continue
+
                 # download artwork to custom folder
                 if ADDON.getSetting("pvr_art_download").lower() == "true":
                     details.update({'art': download_artwork(details['path'], details["art"], self.dict_arttypes)})
 
             if details.get("runtime", False): details.update({'runtime': self.calc_duration(details["runtime"] / 60)})
             if details.get('released', False): details.update({'premiered': convert_date(details.get('released'))})
+            elif details.get('premiered', False): details.update({'premiered': convert_date(details.get('premiered'))})
             if details.get('cast', False):
                 details.update({'castandrole': create_castandrole(details['cast'])})
                 details.pop('cast')

@@ -34,20 +34,20 @@ def jsonrpc(query):
     return None
 
 
-def get_json(url, params):
+def get_json(url, params, prefix=None):
     """
         get info from a rest api
     """
-    log('Query TMDB %s with parameters' % url, pretty_print=params)
+    log('Query database %s with parameters' % url, pretty_print=params)
 
     try:
         response = requests.get(url, params=params, timeout=20)
         response.raise_for_status()
         if response and response.content:
             data = json.loads(response.content)
-            if ADDON.getSetting('log_results') == 'true':
-                log('Result of TMDB database query', pretty_print=data.get('results', data))
-            return data.get('results', data)
+            js_data = data.get(prefix, data) if prefix else data
+            if ADDON.getSetting('log_results') == 'true': log('Result of database query', pretty_print=js_data)
+            return js_data
 
     except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
         xbmc.log(str(e), xbmc.LOGERROR)

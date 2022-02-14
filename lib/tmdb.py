@@ -178,7 +178,7 @@ class Tmdb(object):
         """helper method to map the details received from tmdb to kodi compatible formatting"""
         if not data:
             return {}
-        details = {"tmdb_id": data["id"],
+        details = {"tmdb_id": data["id"], 'tvdb_id': data['external_ids'].get('tvdb_id', None),
                    "ratings": {'tmdb': {'rating': data["vote_average"], 'votes': data["vote_count"]}},
                    "popularity": data["popularity"] * 1000, "popularity.tmdb": data["popularity"] * 1000,
                    "genre": [item["name"] for item in data["genres"]],

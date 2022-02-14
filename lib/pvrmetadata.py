@@ -181,7 +181,7 @@ class PVRMetaData(object):
         self.cache = simplecache.SimpleCache()
         self.cache_str = ''
         self.tmdb = Tmdb()
-        self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart.jpg',
+        self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart.png',
                               'banner': 'banner.jpg', 'logo': 'logo.png', 'clearlogo': 'clearlogo.png',
                               'clearart': 'clearart.png', 'characterart': 'characterart.png', 'poster': 'poster.jpg',
                               'landscape': 'landscape.jpg'}

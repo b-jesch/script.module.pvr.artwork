@@ -7,16 +7,6 @@ import xbmcvfs
 import os
 
 
-def rmdirs(folder, count, force=True):
-    force = force
-    dirs, files = xbmcvfs.listdir(folder)
-    for file in files: xbmcvfs.delete(os.path.join(folder, file))
-    for dir in dirs:
-        rmdirs(os.path.join(folder, dir), count, force=force)
-        if xbmcvfs.rmdir(os.path.join(folder, dir), force=force): count += 1
-    return count
-
-
 if len(sys.argv) > 1:
     if sys.argv[1] == 'clear_db':
         import sqlite3

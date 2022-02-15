@@ -1,7 +1,8 @@
 import time
-
+import os
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcvfs
 import json
 import requests
@@ -11,6 +12,7 @@ from urllib.parse import unquote
 ADDON = xbmcaddon.Addon(id='script.module.pvr.artwork')
 ADDON_ID = ADDON.getAddonInfo('id')
 ADDON_VERSION = ADDON.getAddonInfo('version')
+ADDON_NAME = ADDON.getAddonInfo('name')
 LOC = ADDON.getLocalizedString
 PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
@@ -126,3 +128,22 @@ def convert_date(date, date_format='%Y-%m-%d'):
     except ValueError:
         log('Could not convert date with wrong format: %s' % date, type=xbmc.LOGERROR)
         return date
+
+
+def rmdirs(folder, count, force=True):
+    process_bg = xbmcgui.DialogProgressBG()
+    dirs, files = xbmcvfs.listdir(folder)
+    if len(dirs) > 0: steps = 100 // len(dirs)
+    pcnt = 0
+    steps = 0
+    if len(dirs) > 0: steps = 100 // len(dirs)
+    process_bg.create(ADDON_NAME, LOC(32071))
+    for file in files: xbmcvfs.delete(os.path.join(folder, file))
+    for dir in dirs:
+        rmdirs(os.path.join(folder, dir), count, force=force)
+        process_bg.update(pcnt, ADDON_NAME, LOC(32071))
+        pcnt = pcnt + steps
+        if xbmcvfs.rmdir(os.path.join(folder, dir), force=force): count += 1
+    process_bg.close()
+    return count
+

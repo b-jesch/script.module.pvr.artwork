@@ -67,11 +67,10 @@ def download_image(filename, url):
             connection = sqlite3.connect(dbpath, timeout=30, isolation_level=None)
 
             try:
-                cache_image = connection.execute('SELECT cachedurl FROM texture WHERE url = ?', (filename,)).fetchone()
+                cache_image = connection.execute('SELECT cachedurl FROM texture WHERE url = ?', (filename,)).fetchone()[0]
                 if cache_image and isinstance(cache_image, str):
-                    if xbmcvfs.exists(cache_image): xbmcvfs.delete("special://profile/Thumbnails/%s" % cache_image)
-                    connection.execute('DELETE FROM texture WHERE url = ?', (filename,))
-                    log('Image \'%s\' from texture cache deleted' % cache_image)
+                    if xbmcvfs.delete("special://profile/Thumbnails/%s" % cache_image):
+                        connection.execute('DELETE FROM texture WHERE url = ?', (filename,))
                 connection.close()
             except Exception as e:
                 log(str(e), xbmc.LOGERROR)
@@ -217,7 +216,7 @@ class PVRMetaData(object):
         if details: self.cache.set('recording.%s' % title, details, expiration=timedelta(days=get_cache_lifetime()))
         return details
 
-    def lookup_custom_path(self, searchtitle, title):
+    def lookup_custom_path(self, searchtitle, title, delete_content=False):
         """
             looks up a custom directory if it contains a subdir for the title
         """
@@ -231,14 +230,17 @@ class PVRMetaData(object):
         if title_path and xbmcvfs.exists(title_path):
             # we have found a folder for the title, look for artwork
             files = xbmcvfs.listdir(title_path)[1]
-            for image in files:
-                if image.split('.')[0] in self.dict_arttypes:
-                    details['art'].update({image.split('.')[0]: os.path.join(title_path, image)})
-            for n in range(1, 6):
-                if ('fanart%s.jpg' % n) in files: fanarts.append(os.path.join(title_path, 'fanart%s.jpg' % n))
-                if ('poster%s.jpg' % n) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % n))
-            details['art'].update({'fanarts': fanarts})
-            details['art'].update({'posters': posters})
+            if delete_content:
+                log('%s files in folder %s removed' % (rmdirs(title_path, 0, force=True), title_path))
+            else:
+                for image in files:
+                    if image.split('.')[0] in self.dict_arttypes:
+                        details['art'].update({image.split('.')[0]: os.path.join(title_path, image)})
+                for n in range(1, 6):
+                    if ('fanart%s.jpg' % n) in files: fanarts.append(os.path.join(title_path, 'fanart%s.jpg' % n))
+                    if ('poster%s.jpg' % n) in files: posters.append(os.path.join(title_path, 'poster%s.jpg' % n))
+                details['art'].update({'fanarts': fanarts})
+                details['art'].update({'posters': posters})
 
         details.update({'path': title_path})
         return details
@@ -556,7 +558,8 @@ class PVRMetaData(object):
                     return self.set_art_and_labels(prefix, details)
 
                 # lookup custom path
-                details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
+                if not manual_select: details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
+                else: details.update(self.lookup_custom_path(searchtitle, title, delete_content=True))
             else:
                 details.update({'path': self.get_custom_path(searchtitle, title)})
 

@@ -279,6 +279,10 @@ msgctxt "#32070"
 msgid "%s Folders deleted"
 msgstr ""
 
+msgctxt "#32071"
+msgid "Delete Folders"
+msgstr ""
+
 msgctxt "#32102"
 msgid "Search for Artwork and/or Metadata only for TV recordings."
 msgstr ""

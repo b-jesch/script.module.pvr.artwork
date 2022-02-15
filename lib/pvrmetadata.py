@@ -231,7 +231,7 @@ class PVRMetaData(object):
             # we have found a folder for the title, look for artwork
             files = xbmcvfs.listdir(title_path)[1]
             if delete_content:
-                log('%s files in folder %s removed' % (rmdirs(title_path, 0, force=True), title_path))
+                rmdirs(title_path, 0, force=True)
             else:
                 for image in files:
                     if image.split('.')[0] in self.dict_arttypes:

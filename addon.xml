@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.pvr.artwork" name="PVR Artwork Module" version="2.1.0" provider-name="PvD">
+<addon id="script.module.pvr.artwork" name="PVR Artwork Module" version="2.1.1" provider-name="PvD">
     <requires>
 	    <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.simplecache" version="2.0.2"/>
@@ -11,7 +11,7 @@
     <extension point="kodi.context.item" library="addevent.py">
             <menu id="kodi.core.main">
                 <item library="service.py" args="call_contextmenu">
-                    <label>$LOCALIZE[40362]</label>
+                    <label>32065</label>
                     <visible>System.HasAddon(script.module.pvr.artwork) + Skin.HasSetting(Skin_enablePvrArtwork) + [Window.IsActive(MyPVRChannels.xml) | Window.IsActive(MyPVRGuide.xml) | Window.IsActive(MyPVRRecordings.xml) | Window.IsActive(MyPVRTimers.xml) | Window.IsActive(MyPVRSearch.xml)]</visible>
                 </item>
             </menu>

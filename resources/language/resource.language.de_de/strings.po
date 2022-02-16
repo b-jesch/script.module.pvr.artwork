@@ -275,6 +275,10 @@ msgctxt "#32064"
 msgid "5"
 msgstr ""
 
+msgctxt "#32065"
+msgid "PVR Artwork Module..."
+msgstr "PVR Artwork Modul..."
+
 msgctxt "#32070"
 msgid "%s Folders deleted"
 msgstr "%s Verzeichnisse gelöscht"

@@ -5,10 +5,15 @@ class FanartTv(object):
 
     def __init__(self):
         self.api_key = ADDON.getSetting('fanart_apikey')
+
         self.endpoint = dict({'movie': 'movies', 'tvshow': 'tv'})
-        self.arttypes = dict({'fanart': 'fanart', 'thumb': 'thumb', 'disc': 'discart', 'banner': 'banner', 'logo': 'logo',
-                              'clearlogo': 'clearlogo', 'clearart': 'clearart', 'characterart': 'characterart',
-                              'background': 'fanart', 'landscape': 'landscape.jpg', 'art': 'clearart'})
+        self.prefix = dict({'movie': 'movie', 'tvshow': 'tv'})
+
+        self.arttypes = dict({'fanart': 'fanart', 'thumb': 'thumb', 'banner': 'banner', 'logo': 'logo',
+                              'background': 'fanart', 'landscape': 'landscape', 'poster': 'poster'})
+
+        self.arttypes_general = dict({'disc': 'discart', 'clearlogo': 'clearlogo', 'clearart': 'clearart',
+                                      'characterart': 'characterart'})
 
     def get_fanart_data(self, endpoint, params):
         """
@@ -34,7 +39,14 @@ class FanartTv(object):
         artwork = dict()
         for fanart in res:
             for key in self.arttypes:
-                if key in fanart:
+                if '%s%s' % (self.prefix[media_type], key) in fanart:
                     artwork.update({self.arttypes[key]: res[fanart][0].get('url')})
                     break
+
+            # get general fanarts
+            for key in self.arttypes_general:
+                if key in fanart:
+                    artwork.update({self.arttypes_general[key]: res[fanart][0].get('url')})
+                    break
+
         return artwork

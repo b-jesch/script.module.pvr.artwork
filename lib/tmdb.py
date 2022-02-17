@@ -209,10 +209,16 @@ class Tmdb(object):
                 fanarts = self.get_best_images(data['images']['backdrops'])
                 artwork.update({'fanart': fanarts[0]})
                 artwork.update({'fanarts': fanarts[1:]})
+
             if data["images"].get("posters", False):
                 posters = self.get_best_images(data["images"]["posters"])
                 artwork.update({'poster': posters[0]})
                 artwork.update({'posters': posters[1:]})
+            else:
+                # get poster_path preview poster
+                if data.get('poster_path', False):
+                    artwork.update({'poster': "https://image.tmdb.org/t/p/original%s" % data['poster_path']})
+
             if data["images"].get('logos', False):
                 logos = self.get_best_images(data['images']['logos'], size='w500')
                 artwork.update({'clearlogo': logos[0]})

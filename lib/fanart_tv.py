@@ -27,11 +27,11 @@ class FanartTv(object):
         params.pop('id')
         return get_json(url, params, prefix=None)
 
-    def get_fanarts(self, media_type, imdb_id):
+    def get_fanarts(self, media_type, media_id):
 
-        if not (media_type or imdb_id): return False
+        if not (media_type and media_id): return False
 
-        params = dict({'id': imdb_id, 'lang': LANGUAGE})
+        params = dict({'id': media_id, 'lang': LANGUAGE})
         res = self.get_fanart_data(self.endpoint[media_type], params)
 
         if res is None or res.get('status') == 'error': return False

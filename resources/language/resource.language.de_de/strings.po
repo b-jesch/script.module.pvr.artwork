@@ -370,3 +370,7 @@ msgstr "Dein persönlicher API Schlüssel. Ein Schlüssel lässt sich nach Regis
 msgctxt "#32155"
 msgid "Maximum lifetime for data stored (and used) within a cache. If you want to refresh data earlier, use 'update artwork manual' of the addon settings within the context menu."
 msgstr "Maximale Lebensdauer der Daten, die im Cache gespeichert werden. Sollen diese Daten eher aktualisiert werden, ist eine manuelle Aktualisierung über die Addon  Einstellungen  im Kontextmenü erforderlich."
+
+msgctxt "#40362"
+msgid "PVR Artwork Configuration"
+msgstr "PVR Artwork Konfiguration"

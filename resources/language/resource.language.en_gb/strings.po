@@ -366,3 +366,7 @@ msgstr ""
 msgctxt "#32155"
 msgid "Maximum lifetime for data stored (and used) within a cache. If you want to refresh data earlier, use 'update artwork manual' of the addon settings within the context menu."
 msgstr ""
+
+msgctxt "#40362"
+msgid "PVR Artwork Configuration"
+msgstr ""

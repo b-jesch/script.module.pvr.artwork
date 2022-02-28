@@ -19,7 +19,7 @@ if ADDON.getSetting('pvr_art_custom_path') == '' or ADDON.getSetting('pvr_art_cu
     xbmcvfs.mkdirs(os.path.join(PROFILE, 'artwork'))
     log('set artwork costum path to %s' % os.path.join(PROFILE, 'artwork'))
 
-labels = list(['director', 'writer', 'genre', 'country', 'studio', 'studiologo', 'premiered', 'mpaa', 'status',
+labels = list(['director', 'writer', 'genre', 'country', 'studio', 'studiologo', 'premiered', 'mpaa', 'status', 'is_db',
                'rating', 'ratings', 'ratings.imdb', 'ratings.tmdb', 'ratings.themoviedb','castandrole', 'description'])
 
 win = xbmcgui.Window(10000)
@@ -266,7 +266,8 @@ class PVRMetaData(object):
                                 'art': result['tvshows'][0]['art'], 'genre': result['tvshows'][0]['genre'],
                                 'studio': result['tvshows'][0]['studio'], 'description': result['tvshows'][0]['plot'],
                                 'premiered': result['tvshows'][0]['premiered'], 'mpaa': result['tvshows'][0]['mpaa'],
-                                'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow', 'is_db': True})
+                                'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow',
+                                'is_db': 'defaultnas.png'})
                 media_type = 'tvshow'
 
         if not details and (not media_type or media_type == "movie"):
@@ -284,7 +285,8 @@ class PVRMetaData(object):
                                 'writer': result['movies'][0]['writer'], 'genre': result['movies'][0]['genre'],
                                 'country': result['movies'][0]['country'], 'studio': result['movies'][0]['studio'],
                                 'premiered': result['movies'][0]['premiered'], 'mpaa': result['movies'][0]['mpaa'],
-                                'ratings': result['movies'][0]['ratings'], 'media_type': 'movie',  'is_db': True})
+                                'ratings': result['movies'][0]['ratings'], 'media_type': 'movie',
+                                'is_db': 'defaultnas.png'})
                 media_type = 'movie'
 
         # unquote and cleanup data, create CastAndRole
@@ -545,7 +547,7 @@ class PVRMetaData(object):
             if recording and recording.get("thumbnail"): details["art"]["thumb"] = recording["thumbnail"]
 
             # lookup movie/tv library
-            if ADDON.getSetting('pvr_art_custom') == 'true':
+            if not manual_select and ADDON.getSetting('pvr_art_custom') == 'true':
                 details = extend_dict(details, self.lookup_local_library(searchtitle, details["media_type"]))
                 if details.get('is_db', False):
 
@@ -554,14 +556,11 @@ class PVRMetaData(object):
 
                     log("cache data (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
                     self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
-                    # if manual_select: return details
                     return self.set_art_and_labels(prefix, details)
 
                 # lookup custom path
-                if not manual_select: details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
-                else: details.update(self.lookup_custom_path(searchtitle, title, delete_content=True))
-            else:
-                details.update({'path': self.get_custom_path(searchtitle, title)})
+            if not manual_select: details = extend_dict(details, self.lookup_custom_path(searchtitle, title))
+            else: details.update(self.lookup_custom_path(searchtitle, title, delete_content=True))
 
             # do TMDB scraping if enabled and no arts in previous lookups
             if ADDON.getSetting("use_tmdb").lower() == "true" and ADDON.getSetting('tmdb_apikey'):
@@ -748,35 +747,32 @@ class PVRMetaData(object):
                 if count > 5: break
                 win.setProperty('%s.fanart%s' % (prefix, str(cf + count + 1)), fanart)
 
-    def set_labels(self, prefix, data):
-        # set PVR related list items
-        for label in labels:
-
-            # handle special part 'ratings'
-            if label == 'ratings' and data.get(label, False):
-                allratings = list()
-                for key in self.dict_providers:
-                    if data[label].get(key, False):
-                        (lprop, lval) = '%s.ListItem.%s.%s' % (prefix, label, key), \
-                                        str(round(data[label][key].get('rating', 0), 1))
-                        win.setProperty(lprop, lval)
-                        allratings.append('%s (%s)' % (round(data[label][key].get('rating', 0), 1),
-                                                       self.dict_providers[key]))
-                win.setProperty('%s.ListItem.rating' % prefix, ', '.join(allratings))
-
-            elif data.get(label, False) and data[label]:
-                lvalue = str(data[label])
-                if isinstance(data[label], list): lvalue = ', '.join(data[label])
-                (lprop, lval) = '%s.ListItem.%s' % (prefix, label), lvalue
-                win.setProperty(lprop, lval)
-
     def set_art_and_labels(self, prefix, details):
 
         if details.get('art', False):
             self.set_properties(prefix, details['art'])
             win.setProperty('%s.present' % prefix, 'true')
 
-        self.set_labels(prefix, details)
+        for label in labels:
+
+            # handle special part 'ratings'
+
+            if label == 'ratings' and details.get(label, False):
+                allratings = list()
+                for key in self.dict_providers:
+                    if details[label].get(key, False):
+                        (property, value) = '%s.ListItem.%s.%s' % (prefix, label, key), \
+                                        str(round(details[label][key].get('rating', 0), 1))
+                        win.setProperty(property, value)
+                        allratings.append('%s (%s)' % (round(details[label][key].get('rating', 0), 1),
+                                                       self.dict_providers[key]))
+                win.setProperty('%s.ListItem.rating' % prefix, ', '.join(allratings))
+
+            elif details.get(label, False) and details[label]:
+                value = str(details[label])
+                if isinstance(details[label], list): value = ', '.join(details[label])
+                win.setProperty('%s.ListItem.%s' % (prefix, label), value)
+
         win.clearProperty("%s.Lookup" % prefix)
         return True
 

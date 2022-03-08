@@ -40,13 +40,32 @@ class FanartTv(object):
         for fanart in res:
             for key in self.arttypes:
                 if '%s%s' % (self.prefix[media_type], key) in fanart:
-                    artwork.update({self.arttypes[key]: res[fanart][0].get('url')})
+
+                    # try to get preferred language
+                    pref_lang = False
+                    for index, item in enumerate(res[fanart]):
+                        if item.get('lang') == LANGUAGE:
+                            artwork.update({self.arttypes[key]: item.get('url')})
+                            log('%s for lang %s found: %s' % (self.arttypes[key], LANGUAGE, item.get('url')))
+                            pref_lang = True
+                            break
+                    # no preferred language, simply get first element
+                    if not pref_lang: artwork.update({self.arttypes[key]: res[fanart][0].get('url')})
                     break
 
             # get general fanarts
             for key in self.arttypes_general:
                 if key in fanart:
-                    artwork.update({self.arttypes_general[key]: res[fanart][0].get('url')})
+
+                    # same as above
+                    pref_lang = False
+                    for index, item in enumerate(res[fanart]):
+                        if item.get('lang') == LANGUAGE:
+                            artwork.update({self.arttypes_general[key]: item.get('url')})
+                            log('%s for lang %s found: %s' % (self.arttypes_general[key], LANGUAGE, item.get('url')))
+                            pref_lang = True
+                            break
+                    if not pref_lang: artwork.update({self.arttypes_general[key]: res[fanart][0].get('url')})
                     break
 
         return artwork

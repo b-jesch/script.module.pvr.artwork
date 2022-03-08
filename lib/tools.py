@@ -15,6 +15,7 @@ ADDON_VERSION = ADDON.getAddonInfo('version')
 ADDON_NAME = ADDON.getAddonInfo('name')
 LOC = ADDON.getLocalizedString
 PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+MEDIA_LOCAL = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('path')), 'media', 'defaultnas.png')
 
 LANGUAGE = xbmc.getLanguage(xbmc.ISO_639_1)
 if not LANGUAGE: LANGUAGE = "en"
@@ -43,7 +44,7 @@ def get_json(url, params, prefix=None):
     log('Query database %s with parameters' % url, pretty_print=params)
 
     try:
-        response = requests.get(url, params=params, timeout=20)
+        response = requests.get(url, params=params, timeout=20, headers={'content-type': 'application/json'})
         response.raise_for_status()
         if response and response.content:
             data = json.loads(response.content)

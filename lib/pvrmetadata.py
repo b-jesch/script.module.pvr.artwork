@@ -3,8 +3,6 @@
     and other contributors. This modules use a subset from metadatautils reduced to PVR related content.
 """
 
-import xbmcgui
-import os
 from difflib import SequenceMatcher as SM
 import simplecache
 
@@ -20,7 +18,7 @@ if ADDON.getSetting('pvr_art_custom_path') == '' or ADDON.getSetting('pvr_art_cu
     log('set artwork costum path to %s' % os.path.join(PROFILE, 'artwork'))
 
 labels = list(['director', 'writer', 'genre', 'country', 'studio', 'studiologo', 'premiered', 'mpaa', 'status', 'is_db',
-               'rating', 'ratings', 'ratings.imdb', 'ratings.tmdb', 'ratings.themoviedb','castandrole', 'description'])
+               'rating', 'ratings', 'ratings.imdb', 'ratings.tmdb', 'ratings.themoviedb', 'castandrole', 'description'])
 
 win = xbmcgui.Window(10000)
 
@@ -267,7 +265,7 @@ class PVRMetaData(object):
                                 'studio': result['tvshows'][0]['studio'], 'description': result['tvshows'][0]['plot'],
                                 'premiered': result['tvshows'][0]['premiered'], 'mpaa': result['tvshows'][0]['mpaa'],
                                 'ratings': result['tvshows'][0]['ratings'], 'media_type': 'tvshow',
-                                'is_db': 'defaultnas.png'})
+                                'is_db': MEDIA_LOCAL})
                 media_type = 'tvshow'
 
         if not details and (not media_type or media_type == "movie"):
@@ -286,7 +284,7 @@ class PVRMetaData(object):
                                 'country': result['movies'][0]['country'], 'studio': result['movies'][0]['studio'],
                                 'premiered': result['movies'][0]['premiered'], 'mpaa': result['movies'][0]['mpaa'],
                                 'ratings': result['movies'][0]['ratings'], 'media_type': 'movie',
-                                'is_db': 'defaultnas.png'})
+                                'is_db': MEDIA_LOCAL})
                 media_type = 'movie'
 
         # unquote and cleanup data, create CastAndRole

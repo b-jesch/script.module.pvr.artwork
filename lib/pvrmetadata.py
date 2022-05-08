@@ -563,10 +563,16 @@ class PVRMetaData(object):
             # do TMDB scraping if enabled and no arts in previous lookups
             if ADDON.getSetting("use_tmdb").lower() == "true" and ADDON.getSetting('tmdb_apikey'):
 
-                log("scraping metadata from TMDB for title: %s (media type: %s)" %
-                    (searchtitle, details["media_type"]), type=xbmc.LOGINFO)
-                tmdb_result = self.get_tmdb_details(title=searchtitle, preftype=details["media_type"], year=year,
-                                                    manual_select=manual_select)
+                if details.get('mediatype', False):
+                    log("scraping metadata from TMDB for title: %s (%s) (media type: %s)" %
+                        (searchtitle, year, details["media_type"]), type=xbmc.LOGINFO)
+                    tmdb_result = self.get_tmdb_details(title=searchtitle, preftype=details["media_type"], year=year,
+                                                        manual_select=manual_select)
+                else:
+                    log("scraping metadata from TMDB for title: %s (%s)" % (searchtitle, year), type=xbmc.LOGINFO)
+                    tmdb_result = self.get_tmdb_details(title=searchtitle, preftype='', year=year,
+                                                        manual_select=manual_select)
+
                 if tmdb_result:
                     # Discard online art form tmdb if local art is present and not manual select
                     if details.get('art', False) and not manual_select: tmdb_result.pop('art')

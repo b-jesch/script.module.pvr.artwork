@@ -30,8 +30,7 @@ def pvrartwork(current_item):
 
     label = 'VideoPlayer' if xbmc.getCondVisibility('VideoPlayer.Content(livetv)') else None
     for pvr_content in content_types:
-        if xbmc.getCondVisibility('Window.IsActive(%s)' % pvr_content) \
-                and xbmc.getCondVisibility('Window.IsTopMost(%s)' % pvr_content):
+        if xbmc.getCondVisibility('Window.IsActive(%s)' % pvr_content):
             label = content_types.get(pvr_content, None)
             break
 

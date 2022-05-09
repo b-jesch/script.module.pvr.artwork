@@ -15,6 +15,14 @@ The functions of the module is called periodically from an integrated service (m
 - MyPVRRecordings.xml
 - MyPVRTimers.xml
 - MyPVRSearch.xml
+- MyPVRChannels.xml
+- MyPVRGuide.xml
+- DialogPVRInfo.xml
+- MyPVRRecordings.xml
+- MyPVRTimers.xml
+- MyPVRSearch.xml
+- DialogPVRChannelsOSD.xml
+- DialogPVRChannelGuide
 
 or videoplayer (Video OSD) is present.
 

@@ -6,8 +6,11 @@ from lib.pvrmetadata import PVRMetaData
 
 Pmd = PVRMetaData()
 
-content_types = dict({'MyPVRChannels.xml': 'channels', 'MyPVRGuide.xml': 'tvguide', 'DialogPVRInfo.xml': 'info',
-                      'MyPVRRecordings.xml': 'recordings', 'MyPVRTimers.xml': 'timers', 'MyPVRSearch.xml': 'search'})
+content_types = dict({'MyPVRChannels.xml': 'Container(50).ListItem', 'MyPVRGuide.xml': 'Container(50).ListItem',
+                      'DialogPVRInfo.xml': 'ListItem', 'MyPVRRecordings.xml': 'Container(50).ListItem',
+                      'MyPVRTimers.xml': 'Container(50).ListItem', 'MyPVRSearch.xml': 'Container(50).ListItem',
+                      'DialogPVRChannelsOSD.xml': 'Container(11).ListItem',
+                      'DialogPVRChannelGuide.xml': 'Container(11).ListItem'})
 
 win = xbmcgui.Window(10000)
 
@@ -25,22 +28,23 @@ def pvrartwork(current_item):
 
     # check if Live TV or PVR related window is active
 
+    label = 'VideoPlayer' if xbmc.getCondVisibility('VideoPlayer.Content(livetv)') else None
     for pvr_content in content_types:
         if xbmc.getCondVisibility('Window.IsActive(%s)' % pvr_content):
-            current_content = content_types.get(pvr_content, None)
+            label = content_types.get(pvr_content, None)
             break
 
-    if current_content is None and xbmc.getCondVisibility('VideoPlayer.Content(LiveTV)'): current_content = 'livetv'
-
-    # if no pvr related window there, clear properties and return
-    if current_content is None:
+    # if no pvr related label there, clear properties and return
+    if label is None:
         if win.getProperty('%s.present' % prefix) == 'true': Pmd.clear_properties(prefix)
         return ''
 
-    label = 'VideoPlayer' if current_content == 'livetv' else 'ListItem'
     title = xbmc.getInfoLabel('%s.Title' % label)
-    if label == 'ListItem' and not title: title = xbmc.getInfoLabel('%s.Label' % label)
+    if not title: title = xbmc.getInfoLabel('%s.Label' % label)
+
     channel = xbmc.getInfoLabel('%s.ChannelName' % label)
+    if not channel: channel = xbmc.getInfoLabel('VideoPlayer.ChannelName')
+
     genre = xbmc.getInfoLabel('%s.Genre' % label)
     year = xbmc.getInfoLabel('%s.Year' % label)
 

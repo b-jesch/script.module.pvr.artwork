@@ -6,10 +6,9 @@ from lib.pvrmetadata import PVRMetaData
 
 Pmd = PVRMetaData()
 
-content_types = dict({'MyPVRChannels.xml': 'ListItem', 'MyPVRGuide.xml': 'Container(50).ListItem',
-                      'DialogPVRInfo.xml': 'ListItem', 'MyPVRRecordings.xml': 'Container(50).ListItem',
-                      'MyPVRTimers.xml': 'Container(50).ListItem', 'MyPVRSearch.xml': 'Container(50).ListItem',
-                      'DialogPVRChannelsOSD.xml': 'Container(11).ListItem',
+content_types = dict({'MyPVRChannels.xml': 'ListItem', 'MyPVRGuide.xml': 'ListItem', 'DialogPVRInfo.xml': 'ListItem',
+                      'MyPVRRecordings.xml': 'Container(50).ListItem', 'MyPVRTimers.xml': 'Container(50).ListItem',
+                      'MyPVRSearch.xml': 'Container(50).ListItem', 'DialogPVRChannelsOSD.xml': 'Container(11).ListItem',
                       'DialogPVRChannelGuide.xml': 'Container(11).ListItem'})
 
 win = xbmcgui.Window(10000)

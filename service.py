@@ -1,11 +1,5 @@
 from lib.tools import *
 import sys
-import xbmc
-import xbmcgui
-import xbmcaddon
-import xbmcvfs
-import os
-
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'clear_db':

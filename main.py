@@ -1,7 +1,4 @@
-import xbmc
-
 from lib.tools import *
-import xbmcgui
 from lib.pvrmetadata import PVRMetaData
 
 Pmd = PVRMetaData()
@@ -17,7 +14,6 @@ win = xbmcgui.Window(10000)
 def pvrartwork(current_item):
 
     prefix = 'PVR.Artwork'
-    current_content = None
 
     if xbmc.getCondVisibility('Container(%s).Scrolling') % xbmcgui.getCurrentWindowId() or \
             win.getProperty('%s.Lookup' % prefix) == 'busy':

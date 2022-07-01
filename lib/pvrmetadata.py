@@ -479,6 +479,7 @@ class PVRMetaData(object):
 
         win.setProperty("%s.Lookup" % prefix, "busy")
         self.clear_properties(prefix)
+        log('collect artwork for %s' % prefix)
 
         searchtitle = self.cleanup_title(title.lower())
         self.cache_str = "%s.%s" % (DB_PREFIX, searchtitle)
@@ -729,7 +730,7 @@ class PVRMetaData(object):
         for label in labels: win.clearProperty('%s.ListItem.%s' % (prefix, label))
 
         win.clearProperty('%s.present' % prefix)
-        xbmc.log('Properties of %s cleared' % prefix)
+        log('Properties of %s cleared' % prefix)
 
     def set_properties(self, prefix, artwork):
 

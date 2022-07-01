@@ -1,5 +1,11 @@
 from lib.tools import *
 import sys
+from urllib.parse import parse_qsl
+
+try:
+    from lib.pvrmetadata import PVRMetaData
+except ImportError:
+    sys.exit()
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'clear_db':
@@ -23,12 +29,8 @@ if len(sys.argv) > 1:
         if yesno:
             count = rmdirs(artwork, 0, force=True)
             xbmcgui.Dialog().notification(LOC(32001), LOC(32070) % count, xbmcgui.NOTIFICATION_INFO)
-    elif sys.argv[1] == 'call_contextmenu':
-        try:
-            from lib.pvrmetadata import PVRMetaData
-        except ImportError:
-            sys.exit()
 
+    elif sys.argv[1] == 'call_contextmenu':
         title = xbmc.getInfoLabel("ListItem.Title")
         if not title:
             title = xbmc.getInfoLabel("ListItem.Label")
@@ -39,6 +41,23 @@ if len(sys.argv) > 1:
 
         pmd = PVRMetaData()
         pmd.pvr_artwork_options('PVR.Artwork', title, channel, genre, year)
+
+    elif sys.argv[1] == 'get_artwork':
+        params = dict(parse_qsl(sys.argv[2]))
+        pmd = PVRMetaData()
+        try:
+            pmd.get_pvr_artwork(params['prefix'], params['title'], params['genre'], params['channel'],
+                                manual_select=False, ignore_cache=False)
+        except KeyError:
+            pass
+
+    elif sys.argv[1] == 'clear_artwork':
+        params = dict(parse_qsl(sys.argv[2]))
+        pmd = PVRMetaData()
+        try:
+            pmd.clear_properties(params['prefix'])
+        except KeyError:
+            pass
 
     else:
         xbmc.log('unknown command parameter: %s' % sys.argv[1], xbmc.LOGWARNING)

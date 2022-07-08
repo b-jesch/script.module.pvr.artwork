@@ -131,20 +131,24 @@ def convert_date(date, date_format='%Y-%m-%d'):
         return date
 
 
-def rmdirs(folder, count, force=True):
-    process_bg = xbmcgui.DialogProgressBG()
+def rmdirs(folder, force=True):
+    count = 0
     dirs, files = xbmcvfs.listdir(folder)
-    if len(dirs) > 0: steps = 100 // len(dirs)
-    pcnt = 0
-    steps = 0
-    if len(dirs) > 0: steps = 100 // len(dirs)
+    process_bg = xbmcgui.DialogProgressBG()
     process_bg.create(ADDON_NAME, LOC(32071))
-    for file in files: xbmcvfs.delete(os.path.join(folder, file))
     for dir in dirs:
-        rmdirs(os.path.join(folder, dir), count, force=force)
-        process_bg.update(pcnt, ADDON_NAME, LOC(32071))
-        pcnt = pcnt + steps
-        if xbmcvfs.rmdir(os.path.join(folder, dir), force=force): count += 1
+        dummy, files = xbmcvfs.listdir(os.path.join(folder, dir))
+        for file in files: xbmcvfs.delete(os.path.join(folder, dir, file))
+        log('Deleting folder: %s (%s files)' % (os.path.join(folder, dir), len(files)))
+        if not xbmcvfs.rmdir(os.path.join(folder, dir), force=force):
+            try:
+                os.rmdir(os.path.join(folder, dir).encode('utf-8'))
+                count = count + 1
+            except OSError:
+                log('Couldn\'t remove folder')
+        else:
+            count = count + 1
+
+        process_bg.update(count * 100 // len(dirs), ADDON_NAME, LOC(32071))
     process_bg.close()
     return count
-

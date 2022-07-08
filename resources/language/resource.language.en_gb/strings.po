@@ -212,7 +212,7 @@ msgid "Maintenance"
 msgstr ""
 
 msgctxt "#32049"
-msgid "Delete Artwork Module Entries from Cache"
+msgid "Delete Artwork from Cache and Download Folder"
 msgstr ""
 
 msgctxt "#32050"
@@ -252,7 +252,7 @@ msgid "360 Days"
 msgstr ""
 
 msgctxt "#32059"
-msgid "This will remove all downloaded Artwork from '%s' Folder! Do you want to continue?"
+msgid "This will remove all Entries of the Cache and downloaded Artwork from '%s' Folder! Do you want to continue?"
 msgstr ""
 
 msgctxt "#32060"
@@ -285,6 +285,10 @@ msgstr ""
 
 msgctxt "#32071"
 msgid "Delete Folders"
+msgstr ""
+
+msgctxt "#32072"
+msgid "No Folders deleted"
 msgstr ""
 
 msgctxt "#32102"
@@ -352,11 +356,7 @@ msgid "Log search results in debug log using formatted output. May significant i
 msgstr ""
 
 msgctxt "#32149"
-msgid "Remove all entries of PVR Artwork Module with the current Module Index from SimpleCache Database."
-msgstr ""
-
-msgctxt "#32150"
-msgid "Remove all Artwork Folders from local Download Directory of PVR Artwork Module."
+msgid "Remove all entries of PVR Artwork Module with the current Module Index from SimpleCache Database and delete all Files from Download Folder."
 msgstr ""
 
 msgctxt "#32154"

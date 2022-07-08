@@ -176,6 +176,7 @@ class PVRMetaData(object):
 
     def __init__(self):
         self.cache = simplecache.SimpleCache()
+        self.cache.enable_mem_cache = False
         self.cache_str = ''
         self.tmdb = Tmdb()
         self.dict_arttypes = {'fanart': 'fanart.jpg', 'thumb': 'folder.jpg', 'discart': 'discart.png',

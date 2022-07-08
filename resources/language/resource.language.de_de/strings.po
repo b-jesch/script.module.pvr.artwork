@@ -212,8 +212,8 @@ msgid "Maintenance"
 msgstr "Wartung"
 
 msgctxt "#32049"
-msgid "Delete Artwork Module Entries from Cache"
-msgstr "Einträge aus dem Cache entfernen"
+msgid "Delete Artwork from Cache and Download Folder"
+msgstr "Artwork aus dem Cache und im Download Ordner löschen"
 
 msgctxt "#32050"
 msgid "Delete local Artwork"
@@ -252,8 +252,8 @@ msgid "360 Days"
 msgstr "360 Tage"
 
 msgctxt "#32059"
-msgid "This will remove all downloaded Artwork from '%s' Folder! Do you want to continue?"
-msgstr "Es werden alle heruntergeladene Artwork aus dem Ordner '%s' gelöscht! Möchtest Du fortfahren?"
+msgid "This will remove all Entries of the Cache and downloaded Artwork from '%s' Folder! Do you want to continue?"
+msgstr "Es werden alle Einträge im Cache sowie heruntergeladene Artwork aus dem Ordner '%s' gelöscht! Möchtest Du fortfahren?"
 
 msgctxt "#32060"
 msgid "1"
@@ -286,6 +286,10 @@ msgstr "%s Verzeichnisse gelöscht"
 msgctxt "#32071"
 msgid "Delete Folders"
 msgstr "Lösche Verzeichnisse"
+
+msgctxt "#32072"
+msgid "No Folders deleted"
+msgstr "Keine Verzeichnisse gelöscht"
 
 msgctxt "#32102"
 msgid "Search for Artwork and/or Metadata only for TV recordings."
@@ -352,12 +356,8 @@ msgid "Log search results in debug log using formatted output. May significant i
 msgstr "Logge Suchergebnisse formatiert im Debug Log. Kann die Größe des Logfiles signifikant erhöhen."
 
 msgctxt "#32149"
-msgid "Remove all entries of PVR Artwork Module with the current Module Index from SimpleCache Database."
-msgstr "Entfernt all Einträge des PVR Artwork Modules mit dem aktuellen Modul Index aus der SimpleCache Datenbank."
-
-msgctxt "#32150"
-msgid "Remove all Artwork Folders from local Download Directory of PVR Artwork Module."
-msgstr "Entfernt alle Artwork Ordner aus dem Download Verzeichnis des PVR Artwork Modules."
+msgid "Remove all entries of PVR Artwork Module with the current Module Index from SimpleCache Database and delete all Files from Download Folder."
+msgstr "Entfernt alle Einträge des PVR Artwork Modules mit dem aktuellen Modul Index aus der SimpleCache Datenbank und löscht alle Dateien im Download Verzeichnis."
 
 msgctxt "#32153"
 msgid "Your personal API key. If you don't own a key, request one on the website of the TMDB (www.tmdb.org). Without a personal key a search using the TMDB option is not possible."

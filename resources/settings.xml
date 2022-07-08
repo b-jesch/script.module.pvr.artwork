@@ -209,14 +209,6 @@
 						<close>true</close>
 					</control>
 				</setting>
-				<setting id="del_local_artwork" type="action" label="32050" help="32150">
-					<level>0</level>
-					<default/>
-					<control format="action" type="button">
-						<data>RunScript(script.module.pvr.artwork,clear_local_artwork)</data>
-						<close>true</close>
-					</control>
-				</setting>
 			</group>
 		</category>
 	</section>

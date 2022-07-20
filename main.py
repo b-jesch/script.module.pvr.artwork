@@ -11,15 +11,16 @@ content_types = dict({'MyPVRChannels.xml': 'ListItem', 'MyPVRGuide.xml': 'ListIt
 win = xbmcgui.Window(10000)
 
 
-def pvrartwork(current_item):
+def pvrartwork(t, c):
 
     prefix = 'PVR.Artwork'
+    nu_prefix = 'PVR.Nextup'
 
     if xbmc.getCondVisibility('Container(%s).Scrolling') % xbmcgui.getCurrentWindowId() or \
             win.getProperty('%s.Lookup' % prefix) == 'busy':
         xbmc.sleep(500)
         xbmc.log('Artwork module is busy or scrolling is active, return')
-        return current_item
+        return t, c
 
     # check if Live TV or PVR related window is active
 
@@ -32,7 +33,7 @@ def pvrartwork(current_item):
     # if no pvr related label there, clear properties and return
     if label is None:
         if win.getProperty('%s.present' % prefix) == 'true': Pmd.clear_properties(prefix)
-        return ''
+        return '', ''
 
     title = xbmc.getInfoLabel('%s.Title' % label)
     if not title: title = xbmc.getInfoLabel('%s.Label' % label)
@@ -43,26 +44,38 @@ def pvrartwork(current_item):
     genre = xbmc.getInfoLabel('%s.Genre' % label)
     year = xbmc.getInfoLabel('%s.Year' % label)
 
-    if not (title or channel): return ''
+    if not (title or channel): return '', ''
 
-    if current_item != '%s-%s' % (title, channel) and win.getProperty('%s.Lookup' % prefix) != 'busy':
+    if (t != title or c != channel) and win.getProperty('%s.Lookup' % prefix) != 'busy':
         try:
             Pmd.get_pvr_artwork(prefix, title, channel, genre, year, manual_select=False, ignore_cache=False)
+
+            # get Properties for Nextup window
+
+            prefix = nu_prefix
+            if xbmc.getCondVisibility('VideoPlayer.Content(livetv)') and \
+                    c == xbmc.getInfoLabel('VideoPlayer.ChannelName') and \
+                    win.getProperty('%s.Lookup' % prefix) != 'busy':
+
+                Pmd.get_pvr_artwork(prefix, xbmc.getInfoLabel('VideoPlayer.NextTitle'),
+                                    channel, xbmc.getInfoLabel('VideoPlayer.NextGenre'), '',
+                                    manual_select=False, ignore_cache=False)
         except:
             win.clearProperty('%s.Lookup' % prefix)
             xbmc.log('PVR Artwork module error', xbmcgui.NOTIFICATION_ERROR)
 
-    return '%s-%s' % (title, channel)
+    return title, channel
 
 
 if __name__ == '__main__':
-    current_item = ''
+    t = ''
+    c = ''
     monitor = xbmc.Monitor()
     xbmc.log('PVR Artwork module wrapper started', level=xbmc.LOGINFO)
 
     while not monitor.abortRequested():
         if monitor.waitForAbort(0.5): break
         if xbmc.getCondVisibility('Skin.HasSetting(Skin_enablePvrArtwork)'):
-            current_item = pvrartwork(current_item)
+            t, c = pvrartwork(t, c)
 
     xbmc.log('PVR Artwork module wrapper finished', level=xbmc.LOGINFO)

@@ -201,16 +201,17 @@ class PVRMetaData(object):
         query = {'method': 'PVR.GetRecordings',
                  'params': {'properties': ['title', 'file', 'channel', 'art', 'icon', 'genre']}}
         result = jsonrpc(query)
-        for item in result['recordings']:
-            if title == item["title"] or title in item["file"]:
+        if result:
+            for item in result['recordings']:
+                if title == item["title"] or title in item["file"]:
 
-                # grab thumb from pvr
-                if item.get("art"): details.update({'thumbnail': item['art'].get('thumb')})
-                # ignore tvheadend thumb as it returns the channellogo
-                elif item.get("icon") and "imagecache" not in item["icon"]: details.update({'thumbnail': item['icon']})
+                    # grab thumb from pvr
+                    if item.get("art"): details.update({'thumbnail': item['art'].get('thumb')})
+                    # ignore tvheadend thumb as it returns the channellogo
+                    elif item.get("icon") and "imagecache" not in item["icon"]: details.update({'thumbnail': item['icon']})
 
-                details.update({'channel': item['channel'], 'genre': ' / '.join(item['genre'])})
-                break
+                    details.update({'channel': item['channel'], 'genre': ' / '.join(item['genre'])})
+                    break
 
         if details: self.cache.set('recording.%s' % title, details, expiration=timedelta(days=get_cache_lifetime()))
         return details
@@ -230,7 +231,7 @@ class PVRMetaData(object):
             # we have found a folder for the title, look for artwork
             files = xbmcvfs.listdir(title_path)[1]
             if delete_content:
-                rmdirs(title_path, 0, force=True)
+                rmdirs(title_path, force=True)
             else:
                 for image in files:
                     if image.split('.')[0] in self.dict_arttypes:

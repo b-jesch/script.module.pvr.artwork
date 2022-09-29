@@ -713,15 +713,18 @@ class PVRMetaData(object):
         """manual override artwork options"""
 
         details = self.get_pvr_artwork(prefix, title=title, channel=channel, genre=genre, manual_set=True)
-
-        # show dialogselect with all artwork option
-        changemade, artwork = manual_set_artwork(details["art"], self.dict_arttypes)
-        if changemade:
-            details["art"] = artwork
-            # save results in cache
-            log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
-            self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
-        return self.set_art_and_labels(prefix, details)
+        if not details:
+            xbmcgui.Dialog().notification(LOC(32001), LOC(32021), xbmcgui.NOTIFICATION_WARNING)
+            self.reset_busy_state(prefix)
+        else:
+            # show dialogselect with all artwork option
+            changemade, artwork = manual_set_artwork(details["art"], self.dict_arttypes)
+            if changemade:
+                details["art"] = artwork
+                # save results in cache
+                log("store data in cache (expire in %s days) - %s " % (get_cache_lifetime(), self.cache_str))
+                self.cache.set(self.cache_str, details, expiration=timedelta(days=get_cache_lifetime()))
+            return self.set_art_and_labels(prefix, details)
 
     def clear_properties(self, prefix):
 

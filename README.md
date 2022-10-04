@@ -28,7 +28,14 @@ or videoplayer (Video OSD) is present.
 
 All labels and artwork will be set as Properties in Home window, e.g. `Window(10000).Property('PVR.Artwork.ListItem.director')` or `Window(10000).Property('PVR.Artwork.clearart')`
 
-Unless information provided by ListItems changes, metadata and artwork do not need to be updated. If none of the above windows are displayed, all Properties of PVR Artwork Module in Home window will be cleared.
+`PVR.Artwork` is the default prefix which can be changed to fill up other properties. The module can be triggered by the <load> and <unload> event of a window, for example:
+
+    <onload>RunScript(script.module.pvr.artwork,get_artwork,prefix=PVR.Nextup&amp;title=$INFO[VideoPlayer.NextTitle]&amp;genre=$INFO[VideoPlayer.NextGenre]&amp;channel=$INFO[VideoPlayer.ChannelName])</onload>
+	<onunload>RunScript(script.module.pvr.artwork,clear_artwork,prefix=PVR.Nextup)</onunload>
+
+This will fill the properties with the prefix `PVR.Nextup` eg. `Window(10000).Property(PVR.Nextup.Artwork.fanart)`, `Window(10000).Property(PVR.Nextup.ListItem.ratings)` etc. when the window is loaded and clear them on `<onunload>`.
+
+Unless information provided by ListItems changes, metadata and artwork do not need to be updated. If none of the above windows are displayed, all Properties with the default prefix of PVR Artwork Module in Home window will be cleared.
 
 ### Labels ###
 

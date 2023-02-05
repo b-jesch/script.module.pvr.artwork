@@ -1,7 +1,3 @@
-import xbmc
-import xbmcgui
-import xbmcvfs
-
 from lib.tools import *
 import sys
 from urllib.parse import parse_qsl
@@ -61,19 +57,19 @@ if len(sys.argv) > 1:
         try:
             pmd.get_pvr_artwork(params['prefix'], params['title'], params['genre'], params['channel'],
                                 manual_select=False, ignore_cache=False)
-        except KeyError:
-            pass
+        except KeyError as e:
+            log('An error has occurred: %s' % str(e), xbmc.LOGERROR)
 
     elif sys.argv[1] == 'clear_artwork':
         params = dict(parse_qsl(sys.argv[2]))
         pmd = PVRMetaData()
         try:
             pmd.clear_properties(params['prefix'])
-        except KeyError:
-            pass
+        except KeyError as e:
+            log('An error has occurred: %s' % str(e), xbmc.LOGERROR)
 
     else:
-        xbmc.log('unknown command parameter: %s' % sys.argv[1], xbmc.LOGWARNING)
+        log('unknown command parameter: %s' % sys.argv[1], xbmc.LOGWARNING)
 else:
-    xbmc.log('no command parameter provided', xbmc.LOGWARNING)
+    log('no command parameter provided', xbmc.LOGWARNING)
 

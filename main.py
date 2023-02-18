@@ -48,7 +48,7 @@ def pvrartwork(t, c):
     if (t != title or c != channel) and win.getProperty('%s.Lookup' % prefix) != 'busy':
         try:
             Pmd.get_pvr_artwork(prefix, title, channel, genre, year, manual_select=False, ignore_cache=False)
-        except:
+        except Exception:
             win.clearProperty('%s.Lookup' % prefix)
             xbmc.log('PVR Artwork module error', xbmcgui.NOTIFICATION_ERROR)
 

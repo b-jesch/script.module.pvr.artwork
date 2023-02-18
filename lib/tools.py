@@ -52,7 +52,7 @@ def get_json(url, params, prefix=None):
             if ADDON.getSetting('log_results') == 'true': log('Result of database query', pretty_print=js_data)
             return js_data
 
-    except (requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
+    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as e:
         xbmc.log(str(e), xbmc.LOGERROR)
 
     return None

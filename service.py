@@ -72,4 +72,3 @@ if len(sys.argv) > 1:
         log('unknown command parameter: %s' % sys.argv[1], xbmc.LOGWARNING)
 else:
     log('no command parameter provided', xbmc.LOGWARNING)
-

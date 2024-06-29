@@ -600,16 +600,16 @@ class PVRMetaData(object):
                     FTv = FanartTv()
                     if details.get('media_type', False):
                         id = details.get('tmdb_id', None) if details['media_type'] == 'movie' else details.get('tvdb_id', None)
-                        additional_fanart = FTv.get_fanarts(details.get('media_type'), id)
-
-                        if additional_fanart:
-                            for key in additional_fanart.keys():
-                                if not details['art'].get(key, False): details['art'].update({key: additional_fanart[key]})
-                                elif ADDON.getSetting('prefer_fanart_tv').lower() == 'true':
-                                    details['art'].update({key: additional_fanart[key]})
-                                    log('overwrite TMDB %s with item from fanart.tv due settings' % key)
-                                else:
-                                    continue
+                        if id is not None:
+                            additional_fanart = FTv.get_fanarts(details.get('media_type'), id)
+                            if additional_fanart:
+                                for key in additional_fanart.keys():
+                                    if not details['art'].get(key, False): details['art'].update({key: additional_fanart[key]})
+                                    elif ADDON.getSetting('prefer_fanart_tv').lower() == 'true':
+                                        details['art'].update({key: additional_fanart[key]})
+                                        log('overwrite TMDB %s with item from fanart.tv due settings' % key)
+                                    else:
+                                        continue
 
                 # download artwork to custom folder
                 if ADDON.getSetting("pvr_art_download").lower() == "true":

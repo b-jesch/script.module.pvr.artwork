@@ -9,11 +9,9 @@ content_types = dict({'MyPVRChannels.xml': 'ListItem', 'MyPVRGuide.xml': 'ListIt
                       'DialogPVRChannelGuide.xml': 'Container(11).ListItem'})
 
 win = xbmcgui.Window(10000)
-
+prefix = 'PVR.Artwork'
 
 def pvrartwork(t, c):
-
-    prefix = 'PVR.Artwork'
 
     if xbmc.getCondVisibility('Container(%s).Scrolling') % xbmcgui.getCurrentWindowId() or \
             win.getProperty('%s.Lookup' % prefix) == 'busy':
@@ -66,4 +64,5 @@ if __name__ == '__main__':
         if xbmc.getCondVisibility('Skin.HasSetting(Skin_enablePvrArtwork)'):
             t, c = pvrartwork(t, c)
 
+    Pmd.clear_properties(prefix)
     xbmc.log('PVR Artwork module wrapper finished', level=xbmc.LOGINFO)

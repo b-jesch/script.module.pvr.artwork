@@ -60,7 +60,7 @@ if __name__ == '__main__':
     xbmc.log('PVR Artwork module wrapper started', level=xbmc.LOGINFO)
 
     while not monitor.abortRequested():
-        if monitor.waitForAbort(0.5): break
+        if monitor.waitForAbort(1): break
         if xbmc.getCondVisibility('Skin.HasSetting(Skin_enablePvrArtwork)'):
             t, c = pvrartwork(t, c)
 

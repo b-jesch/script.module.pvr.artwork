@@ -28,13 +28,17 @@ class FanartTv(object):
         return get_json(url, params, prefix=None)
 
     def get_localized_art(self, artwork, group, key, fanart):
-        for index, item in enumerate(fanart):
-            if item.get('lang') == LANGUAGE:
-                log('Found %s in preferred language \'%s\'' % (key, LANGUAGE))
-                return artwork.update({group[key]: item.get('url')})
+        try:
+            for index, item in enumerate(fanart):
+                if item.get('lang') == LANGUAGE:
+                    log('Found %s in preferred language \'%s\'' % (key, LANGUAGE))
+                    return artwork.update({group[key]: item.get('url')})
 
-        # no preferred fanart found, simply return with first item
-        return artwork.update({group[key]: fanart[0].get('url')})
+            #  no preferred fanart found, simply return with first item
+            return artwork.update({group[key]: fanart[0].get('url')})
+
+        except TypeError:
+            return False
 
     def get_fanarts(self, media_type, media_id):
 
